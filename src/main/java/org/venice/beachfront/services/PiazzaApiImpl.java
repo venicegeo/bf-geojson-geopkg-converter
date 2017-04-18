@@ -1,6 +1,12 @@
 package org.venice.beachfront.services;
 
-import org.geotools.data.simple.SimpleFeatureCollection;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+
+import org.geotools.feature.DefaultFeatureCollection;
+import org.geotools.geojson.feature.FeatureJSON;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -17,8 +23,11 @@ public class PiazzaApiImpl implements PiazzaApi {
 
     private PiazzaApi.HttpRequestFactory requestFactory;
 
-    public PiazzaApiImpl(@Autowired @Value("${piazza.url}") String piazzaUrl,
-            @Autowired PiazzaApi.HttpRequestFactory requestFactory) {
+    @Autowired
+    public PiazzaApiImpl(
+            @Value("${piazza.url}") String piazzaUrl,
+            PiazzaApi.HttpRequestFactory requestFactory
+        ) {
         this.piazzaUrl = piazzaUrl;
         this.requestFactory = requestFactory;
     }
@@ -46,13 +55,20 @@ public class PiazzaApiImpl implements PiazzaApi {
         return result.share();
     }
 
-    public SimpleFeatureCollection geoJSONtoFeatureCollection(byte[] geoJSON) {
-        System.err.printf("Convert json to feature collection: %s\n", new String(geoJSON));
-        return null;
+    public DefaultFeatureCollection geoJSONtoFeatureCollection(byte[] geoJSON) {
+        DefaultFeatureCollection fc;
+        try {
+            Reader reader = new InputStreamReader(new ByteArrayInputStream(geoJSON));
+            fc = (DefaultFeatureCollection)new FeatureJSON().readFeatureCollection(reader);
+        } catch (IOException e) {
+            System.err.printf("Failed to convert json to feature collection: %s\n", new String(geoJSON));
+            fc = null;
+        }
+        return fc;
     }
 
     public String getUrlForItemId(String id) {
-        return String.format("%s/data/%s", this.piazzaUrl, id);
+        return String.format("%s/file/%s", this.piazzaUrl, id);
     }
 
     @Bean

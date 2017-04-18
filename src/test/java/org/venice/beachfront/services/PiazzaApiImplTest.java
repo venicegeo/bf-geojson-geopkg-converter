@@ -35,7 +35,7 @@ public class PiazzaApiImplTest extends TestCase {
 
     public void testGetUrlForItemId() {
         String url = this.piazzaApi.getUrlForItemId("foo");
-        String expected = this.mockPiazzaUrl + "/data/foo";
+        String expected = this.mockPiazzaUrl + "/file/foo";
         Assert.assertEquals(expected, url);
     }
 

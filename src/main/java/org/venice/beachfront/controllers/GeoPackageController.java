@@ -46,7 +46,6 @@ public class GeoPackageController {
             return result;
         }
 
-
         this.piazzaApi.getGeoJSON(id, pzKey)
             .map(json -> {
                 return this.piazzaApi.geoJSONtoFeatureCollection(json);

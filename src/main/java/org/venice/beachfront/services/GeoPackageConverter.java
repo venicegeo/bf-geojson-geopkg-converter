@@ -1,7 +1,7 @@
 package org.venice.beachfront.services;
 
-import org.geotools.data.simple.SimpleFeatureCollection;
+import org.geotools.feature.DefaultFeatureCollection;
 
 public interface GeoPackageConverter {
-    public byte[] geoJSONToGeoPackage(SimpleFeatureCollection fc);
+    public byte[] geoJSONToGeoPackage(DefaultFeatureCollection fc);
 }
