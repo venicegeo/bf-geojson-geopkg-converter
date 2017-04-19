@@ -36,8 +36,10 @@ public class GeoPackageControllerTest extends TestCase {
             .thenReturn(this.mockFeatureCollection);
 
         this.mockGeoPackageConverter = Mockito.mock(GeoPackageConverter.class);
-        this.mockResponse = Mockito.mock(HttpServletResponse.class);
+        Mockito.when(this.mockGeoPackageConverter.apply(this.mockFeatureCollection))
+            .thenReturn(this.mockResultSqlite);
 
+        this.mockResponse = Mockito.mock(HttpServletResponse.class);
         this.controller = new GeoPackageController(this.mockPiazzaApi, this.mockGeoPackageConverter);
     }
 
@@ -65,5 +67,10 @@ public class GeoPackageControllerTest extends TestCase {
                 GeoPackageConverter.GeoPackageConversionError.class, 
                 e.getCause().getClass());
         }
+    }
+
+    public void testCorrectMockedOutput() throws ExecutionException, InterruptedException {
+        byte[] result = this.controller.convertToGeoPackage(this.mockItemId, this.mockPzApiKey, this.mockResponse).get();
+        Assert.assertEquals(new String(this.mockResultSqlite), new String(result));
     }
 }
