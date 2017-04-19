@@ -1,19 +1,15 @@
 package org.venice.beachfront.services;
 
-import java.io.StringWriter;
 
 import org.geotools.feature.DefaultFeatureCollection;
-import org.geotools.geojson.GeoJSON;
 import org.springframework.stereotype.Service;
 
 @Service
 public class GeoPackageConverterImpl implements GeoPackageConverter {
-        public byte[] geoJSONToGeoPackage(DefaultFeatureCollection fc) throws GeoPackageConverter.GeoPackageConversionError {
+        public byte[] apply(DefaultFeatureCollection fc) {
             try {
-                // TODO: Include actual conversion to GPKG here
-                StringWriter writer = new StringWriter();
-                GeoJSON.write(fc, writer);
-                return writer.getBuffer().toString().getBytes();
+                // TODO: Do actual conversion code here
+                return "Not implemented".getBytes();
             } catch (Exception e) {
                 throw new GeoPackageConverter.GeoPackageConversionError(e);
             }

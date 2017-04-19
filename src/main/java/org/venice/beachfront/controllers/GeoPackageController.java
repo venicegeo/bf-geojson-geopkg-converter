@@ -52,7 +52,7 @@ public class GeoPackageController {
         })
             .thenCompose(ok -> this.piazzaApi.getGeoJSON(id, pzKey))
             .thenApply(json -> this.piazzaApi.geoJSONtoFeatureCollection(json))
-            .thenApply(fc -> this.geoPackageConverter.geoJSONToGeoPackage(fc));
+            .thenApply(this.geoPackageConverter);
     }
 
     @ExceptionHandler(MissingPiazzaKeyException.class)
