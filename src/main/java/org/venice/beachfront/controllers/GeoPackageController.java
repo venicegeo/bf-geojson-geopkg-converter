@@ -44,13 +44,13 @@ public class GeoPackageController {
         @RequestParam(name="pzKey", defaultValue="") String pzKey,
         final HttpServletResponse response
     ) {
-        final CompletableFuture<byte[]> result = new CompletableFuture<>();
-        if (pzKey.length() < 1) {
-            result.completeExceptionally(new MissingPiazzaKeyException());
-            return result;
-        }
-
-        return this.piazzaApi.getGeoJSON(id, pzKey)
+        return CompletableFuture.supplyAsync(() -> {
+            if (pzKey.length() < 1) {
+                throw new MissingPiazzaKeyException();
+            }
+            return null;
+        })
+            .thenCompose(ok -> this.piazzaApi.getGeoJSON(id, pzKey))
             .thenApply(json -> this.piazzaApi.geoJSONtoFeatureCollection(json))
             .thenApply(fc -> this.geoPackageConverter.geoJSONToGeoPackage(fc));
     }
