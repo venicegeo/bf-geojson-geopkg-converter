@@ -16,6 +16,6 @@ public interface PiazzaApi {
     public interface HttpRequestFactory {
     public HttpRequest getHttpRequest(String url);
     }
-    public class ApiKeyNotSpecifiedException extends Exception {}
-    public class DataIdNotSpecifiedException extends Exception {}
+    public class ApiKeyNotSpecifiedException extends RuntimeException {}
+    public class DataIdNotSpecifiedException extends RuntimeException {}
 }

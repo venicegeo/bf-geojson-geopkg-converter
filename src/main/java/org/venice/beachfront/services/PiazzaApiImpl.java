@@ -31,26 +31,17 @@ public class PiazzaApiImpl implements PiazzaApi {
     }
 
     public CompletableFuture<byte[]> getGeoJSON(String id, String pzKey) {
-        CompletableFuture<byte[]> result = new CompletableFuture<>();
-
-        new Thread(() -> {
+        return CompletableFuture.supplyAsync(() -> {
             if (id == null || id.length() < 1) {
-                result.completeExceptionally(new PiazzaApi.DataIdNotSpecifiedException());            
-                return;
+                throw new PiazzaApi.DataIdNotSpecifiedException();            
             }
             if (pzKey == null || pzKey.length() < 1) {
-                result.completeExceptionally(new PiazzaApi.ApiKeyNotSpecifiedException());
-                return;
+                throw new PiazzaApi.ApiKeyNotSpecifiedException();
             }
-            try {
-                String url = this.getUrlForItemId(id);
-                HttpRequest request = this.requestFactory.getHttpRequest(url).basic(pzKey, "");
-                result.complete(request.bytes());
-            } catch(Exception e) {
-                result.completeExceptionally(e);
-            }
-        }).start();
-        return result;
+            String url = this.getUrlForItemId(id);
+            HttpRequest request = this.requestFactory.getHttpRequest(url).basic(pzKey, "");
+            return request.bytes();
+        });
     }
 
     public DefaultFeatureCollection geoJSONtoFeatureCollection(byte[] geoJSON) {
