@@ -2,6 +2,8 @@ package org.venice.beachfront.controllers;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -14,12 +16,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.context.request.async.DeferredResult;
 import org.venice.beachfront.services.GeoPackageConverter;
 import org.venice.beachfront.services.PiazzaApi;
-import org.venice.beachfront.services.GeoPackageConverter.GeoPackageConversionError;
 
-import rx.Observable;
 
 @Controller
 public class GeoPackageController {
@@ -40,36 +39,20 @@ public class GeoPackageController {
         method=RequestMethod.GET,
         produces={"application/x-sqlite3"})
     @ResponseBody
-    public DeferredResult<byte[]> convertToGeoPackage (
+    public Future<byte[]> convertToGeoPackage (
         @PathVariable(name="id", required=true) String id,
         @RequestParam(name="pzKey", defaultValue="") String pzKey,
         final HttpServletResponse response
     ) {
-        final DeferredResult<byte[]> result = new DeferredResult<>();
+        final CompletableFuture<byte[]> result = new CompletableFuture<>();
         if (pzKey.length() < 1) {
-            result.setErrorResult(new MissingPiazzaKeyException());
+            result.completeExceptionally(new MissingPiazzaKeyException());
             return result;
         }
 
-        this.piazzaApi.getGeoJSON(id, pzKey)
-            .map(json -> {
-                return this.piazzaApi.geoJSONtoFeatureCollection(json);
-            })
-            .flatMap(fc -> {
-                try {
-                    byte[] gpkg = this.geoPackageConverter.geoJSONToGeoPackage(fc);
-                    return Observable.just(gpkg);
-                } catch (GeoPackageConversionError err) {
-                    return Observable.error(err);
-                }
-            })
-            .subscribe(geoPackageData -> {
-                result.setResult(geoPackageData);
-            }, err -> {
-                result.setErrorResult(err);
-            });
-
-        return result;
+        return this.piazzaApi.getGeoJSON(id, pzKey)
+            .thenApply(json -> this.piazzaApi.geoJSONtoFeatureCollection(json))
+            .thenApply(fc -> this.geoPackageConverter.geoJSONToGeoPackage(fc));
     }
 
     @ExceptionHandler(MissingPiazzaKeyException.class)
@@ -90,6 +73,6 @@ public class GeoPackageController {
     }
 
     @SuppressWarnings("serial")
-    private class MissingPiazzaKeyException extends RuntimeException {}
+    public class MissingPiazzaKeyException extends RuntimeException {}
 
 }

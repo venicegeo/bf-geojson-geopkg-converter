@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.concurrent.CompletableFuture;
 
 import org.geotools.feature.DefaultFeatureCollection;
 import org.geotools.geojson.feature.FeatureJSON;
@@ -13,9 +14,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
 import com.github.kevinsawicki.http.HttpRequest;
-
-import rx.subjects.AsyncSubject;
-import rx.Observable;
 
 @Service
 public class PiazzaApiImpl implements PiazzaApi {
@@ -32,27 +30,27 @@ public class PiazzaApiImpl implements PiazzaApi {
         this.requestFactory = requestFactory;
     }
 
-    public Observable<byte[]> getGeoJSON(String id, String pzKey) {
-        AsyncSubject<byte[]> result = AsyncSubject.create();
+    public CompletableFuture<byte[]> getGeoJSON(String id, String pzKey) {
+        CompletableFuture<byte[]> result = new CompletableFuture<>();
+
         new Thread(() -> {
             if (id == null || id.length() < 1) {
-                result.onError(new PiazzaApi.DataIdNotSpecifiedException());            
+                result.completeExceptionally(new PiazzaApi.DataIdNotSpecifiedException());            
                 return;
             }
             if (pzKey == null || pzKey.length() < 1) {
-                result.onError(new PiazzaApi.ApiKeyNotSpecifiedException());
+                result.completeExceptionally(new PiazzaApi.ApiKeyNotSpecifiedException());
                 return;
             }
             try {
                 String url = this.getUrlForItemId(id);
                 HttpRequest request = this.requestFactory.getHttpRequest(url).basic(pzKey, "");
-                result.onNext(request.bytes());
-                result.onCompleted();
+                result.complete(request.bytes());
             } catch(Exception e) {
-                result.onError(e);
+                result.completeExceptionally(e);
             }
         }).start();
-        return result.share();
+        return result;
     }
 
     public DefaultFeatureCollection geoJSONtoFeatureCollection(byte[] geoJSON) {

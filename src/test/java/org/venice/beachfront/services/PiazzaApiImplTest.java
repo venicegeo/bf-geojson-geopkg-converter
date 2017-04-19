@@ -7,7 +7,8 @@ import com.github.kevinsawicki.http.HttpRequest;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
-import rx.Observable;
+
+import java.util.concurrent.ExecutionException;
 
 import org.mockito.Mockito;
 
@@ -39,41 +40,40 @@ public class PiazzaApiImplTest extends TestCase {
         Assert.assertEquals(expected, url);
     }
 
-    public void testGetGeoJSON_correctResult() {
-        byte[] result = this.piazzaApi.getGeoJSON(this.mockId, this.mockPzKey)
-            .toBlocking().single();
+    public void testGetGeoJSON_correctResult() throws ExecutionException, InterruptedException {
+        byte[] result = this.piazzaApi.getGeoJSON(this.mockId, this.mockPzKey).get();
         Assert.assertEquals(this.mockRequestBody, new String(result));
     }
 
-    public void testGetGeoJSON_noDataIdError() {
-        this.piazzaApi.getGeoJSON(null, this.mockPzKey)
-            .onErrorResumeNext((Throwable e) -> {
-                Assert.assertSame(PiazzaApi.DataIdNotSpecifiedException.class, e.getClass());
-                return Observable.empty();
-            })
-            .toBlocking().subscribe();
+    public void testGetGeoJSON_noDataIdError() throws InterruptedException {
+        try {
+            this.piazzaApi.getGeoJSON(null, this.mockPzKey).get();
+            Assert.fail("Expected error passing in null data ID, got no error.");
+        } catch (ExecutionException e) {
+            Assert.assertEquals(PiazzaApi.DataIdNotSpecifiedException.class, e.getCause().getClass());
+        }
 
-        this.piazzaApi.getGeoJSON("", this.mockPzKey)
-            .onErrorResumeNext((Throwable e) -> {
-                Assert.assertSame(PiazzaApi.DataIdNotSpecifiedException.class, e.getClass());
-                return Observable.empty();
-            })
-            .toBlocking().subscribe();
+        try {
+            this.piazzaApi.getGeoJSON("", this.mockPzKey).get();
+            Assert.fail("Expected error passing in empty data ID, got no error.");
+        } catch (ExecutionException e) {
+            Assert.assertEquals(PiazzaApi.DataIdNotSpecifiedException.class, e.getCause().getClass());
+        }
     }
 
-    public void testGetGeoJSON_noApiKeyError() {
-        this.piazzaApi.getGeoJSON(this.mockId, null)
-            .onErrorResumeNext((Throwable e) -> {
-                Assert.assertSame(PiazzaApi.ApiKeyNotSpecifiedException.class, e.getClass());
-                return Observable.empty();
-            })
-            .toBlocking().subscribe();
+    public void testGetGeoJSON_noApiKeyError() throws InterruptedException {
+        try {
+            this.piazzaApi.getGeoJSON(this.mockId, null).get();
+            Assert.fail("Expected error passing in null API key, got no error.");
+        } catch (ExecutionException e) {
+            Assert.assertEquals(PiazzaApi.ApiKeyNotSpecifiedException.class, e.getCause().getClass());
+        }
 
-        this.piazzaApi.getGeoJSON(this.mockId, "")
-            .onErrorResumeNext((Throwable e) -> {
-                Assert.assertSame(PiazzaApi.ApiKeyNotSpecifiedException.class, e.getClass());
-                return Observable.empty();
-            })
-            .toBlocking().subscribe();
+        try {
+            this.piazzaApi.getGeoJSON(this.mockId, null).get();
+            Assert.fail("Expected error passing in null API key, got no error.");
+        } catch (ExecutionException e) {
+            Assert.assertEquals(PiazzaApi.ApiKeyNotSpecifiedException.class, e.getCause().getClass());
+        }
     }
 }

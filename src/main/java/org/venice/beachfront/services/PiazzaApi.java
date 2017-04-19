@@ -1,15 +1,15 @@
 package org.venice.beachfront.services;
 
 
+import java.util.concurrent.CompletableFuture;
+
 import org.geotools.feature.DefaultFeatureCollection;
 
 import com.github.kevinsawicki.http.HttpRequest;
 
-import rx.Observable;
-
 @SuppressWarnings({"serial"})
 public interface PiazzaApi {
-    public Observable<byte[]> getGeoJSON(String id, String pzKey);
+    public CompletableFuture<byte[]> getGeoJSON(String id, String pzKey);
     public DefaultFeatureCollection geoJSONtoFeatureCollection(byte[] geoJSON);
 
     public String getUrlForItemId(String id);
