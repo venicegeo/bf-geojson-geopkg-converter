@@ -51,7 +51,12 @@ public class GeoPackageController {
             return null;
         })
             .thenCompose(ok -> this.piazzaApi.getGeoJSON(id, pzKey))
-            .thenApply(this.geoPackageConverter);
+            .thenApply(this.geoPackageConverter)
+            .thenApply((data) -> {
+                String filename = String.format("%s.gpkg", id);
+                response.setHeader("Content-disposition", String.format("attachment; filename=%s", filename));
+                return data;
+            });
     }
 
     @ExceptionHandler(MissingPiazzaKeyException.class)

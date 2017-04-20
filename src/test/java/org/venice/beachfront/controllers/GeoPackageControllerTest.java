@@ -67,4 +67,12 @@ public class GeoPackageControllerTest extends TestCase {
         byte[] result = this.controller.convertToGeoPackage(this.mockItemId, this.mockPzApiKey, this.mockResponse).get();
         Assert.assertEquals(new String(this.mockResultSqlite), new String(result));
     }
+
+    public void testCorrectHeaderSideEffect() throws ExecutionException, InterruptedException {
+        this.controller.convertToGeoPackage(this.mockItemId, this.mockPzApiKey, this.mockResponse).get();
+        Mockito.verify(this.mockResponse).setHeader(
+            Mockito.eq("Content-disposition"), 
+            Mockito.eq(String.format("attachment; filename=%s.gpkg", this.mockItemId))
+        );
+    } 
 }
