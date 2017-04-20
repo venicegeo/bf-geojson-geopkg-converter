@@ -1,13 +1,7 @@
 package org.venice.beachfront.services;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.util.concurrent.CompletableFuture;
 
-import org.geotools.feature.DefaultFeatureCollection;
-import org.geotools.geojson.feature.FeatureJSON;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -42,18 +36,6 @@ public class PiazzaApiImpl implements PiazzaApi {
             HttpRequest request = this.requestFactory.getHttpRequest(url).basic(pzKey, "");
             return request.bytes();
         });
-    }
-
-    public DefaultFeatureCollection geoJSONtoFeatureCollection(byte[] geoJSON) {
-        DefaultFeatureCollection fc;
-        try {
-            Reader reader = new InputStreamReader(new ByteArrayInputStream(geoJSON));
-            fc = (DefaultFeatureCollection)new FeatureJSON().readFeatureCollection(reader);
-        } catch (IOException e) {
-            System.err.printf("Failed to convert json to feature collection: %s\n", new String(geoJSON));
-            fc = null;
-        }
-        return fc;
     }
 
     public String getUrlForItemId(String id) {

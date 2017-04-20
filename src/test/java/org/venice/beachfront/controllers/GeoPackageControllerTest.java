@@ -5,7 +5,6 @@ import java.util.concurrent.ExecutionException;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.geotools.feature.DefaultFeatureCollection;
 import org.mockito.Mockito;
 import org.venice.beachfront.services.GeoPackageConverter;
 import org.venice.beachfront.services.PiazzaApi;
@@ -24,19 +23,14 @@ public class GeoPackageControllerTest extends TestCase {
     String mockPzApiKey = "Piazza-Mock-API-Key-456";
     byte[] mockGeoJSON = "{}".getBytes();
     byte[] mockResultSqlite = "sample sqlite".getBytes();
-    DefaultFeatureCollection mockFeatureCollection;
 
     public void setUp() {
-        this.mockFeatureCollection = Mockito.mock(DefaultFeatureCollection.class);
-
         this.mockPiazzaApi = Mockito.mock(PiazzaApi.class);
         Mockito.when(this.mockPiazzaApi.getGeoJSON(this.mockItemId, this.mockPzApiKey))
             .thenReturn(CompletableFuture.completedFuture(mockGeoJSON));
-        Mockito.when(this.mockPiazzaApi.geoJSONtoFeatureCollection(Mockito.any()))
-            .thenReturn(this.mockFeatureCollection);
 
         this.mockGeoPackageConverter = Mockito.mock(GeoPackageConverter.class);
-        Mockito.when(this.mockGeoPackageConverter.apply(this.mockFeatureCollection))
+        Mockito.when(this.mockGeoPackageConverter.apply(this.mockGeoJSON))
             .thenReturn(this.mockResultSqlite);
 
         this.mockResponse = Mockito.mock(HttpServletResponse.class);

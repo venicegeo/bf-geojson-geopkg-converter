@@ -51,7 +51,6 @@ public class GeoPackageController {
             return null;
         })
             .thenCompose(ok -> this.piazzaApi.getGeoJSON(id, pzKey))
-            .thenApply(json -> this.piazzaApi.geoJSONtoFeatureCollection(json))
             .thenApply(this.geoPackageConverter);
     }
 

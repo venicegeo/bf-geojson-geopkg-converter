@@ -47,11 +47,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.geotools</groupId>
-            <artifactId>gt-geojson</artifactId>
-            <version>17.0</version>
-        </dependency>
-        <dependency>
             <groupId>com.github.kevinsawicki</groupId>
             <artifactId>http-request</artifactId>
             <version>6.0</version>
@@ -67,14 +62,6 @@
         <repository>
             <id>spring-releases</id>
             <url>https://repo.spring.io/libs-release</url>
-        </repository>
-        <repository>
-            <id>boundlessgeo</id>
-            <url>http://repo.boundlessgeo.com/main/</url>
-        </repository>
-        <repository>
-            <id>osgeo</id>
-            <url>http://download.osgeo.org/webdav/geotools/</url>
         </repository>
     </repositories>
     <pluginRepositories>
