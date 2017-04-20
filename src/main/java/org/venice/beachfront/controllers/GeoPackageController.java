@@ -19,12 +19,29 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.venice.beachfront.services.GeoPackageConverter;
 import org.venice.beachfront.services.PiazzaApi;
 
-
+/**
+ * Main controller class for the conversion endpoint.
+ * 
+ * @version 1.0
+ */
 @Controller
 public class GeoPackageController {
+    /**
+     * Injected dependency on the Piazza API service.
+     */
     private PiazzaApi piazzaApi;
+
+    /**
+     * Injected dependency on the GeoPackage converter service.
+     */
     private GeoPackageConverter geoPackageConverter;
 
+    /**
+     * Construct the GeoPackageController.
+     * 
+     * @param piazzaApi The Piazza API service instance to use
+     * @param geoPackageConverter The GeoPackageConverter service instance to use
+     */
     @Autowired
     public GeoPackageController(
         PiazzaApi piazzaApi,
@@ -34,6 +51,30 @@ public class GeoPackageController {
         this.geoPackageConverter = geoPackageConverter;
     }
 
+    /**
+     * Core handler for converting from a Piazza ID to a GeoJSON file.
+     * 
+     * This controller serves to coordinate the process of querying Piazza
+     * for GeoJSON data, calling the conversion step, then formatting the
+     * outcome as a proper HTTP response.
+     * 
+     * It is composed in an asynchronous way using Java 8 {@link CompletableFuture}
+     * chaining. This enables non-blocking operation regardless of the
+     * webserver's execution mode (even if all requests are processed on the
+     * same thread).
+     * 
+     * {@link RequestMapping} decorated using the path {@code /convert/<id>},
+     * request method GET, and as producing "application/x-sqlite3". It should
+     * result in a side-effect of setting the "Content-disposition" header on
+     * the given response as appropriate.
+     * 
+     * @param id ID of the Piazza object being queried; filled in from the URL
+     * @param pzKey Piazza API key to use; filled in from the "pzKey" query parameter
+     * @param response {@link HttpServletResponse} object for the response
+     * 
+     * @return A {@link Future} that will contain the resulting SQLite data once
+     *         the request is complete
+     */
     @RequestMapping(
         path="/convert/{id}",
         method=RequestMethod.GET,
@@ -59,6 +100,14 @@ public class GeoPackageController {
             });
     }
 
+    /**
+     * Handler for missing the "pzApi" URL parameter.
+     * 
+     * As a side effect, sets the response status code to 400 Bad Request.
+     * 
+     * @param response {@link HttpServletResponse} response object
+     * @return String error message to return to the client
+     */
     @ExceptionHandler(MissingPiazzaKeyException.class)
     @ResponseBody
     private String missingPiazzaKeyHandler(HttpServletResponse response) {
@@ -66,6 +115,15 @@ public class GeoPackageController {
         return "Missing `pzApi` query parameter.";
     }
 
+    /**
+     * Handler for errors during the GeoJSON to GPKG conversion.
+     * 
+     * General handler for a server error during the conversion.
+     * As a side efect, sets the response status code to 500 Server Error.
+     * 
+     * @param response {@link HttpServletResponse} response object
+     * @return String error message to return to the client
+     */
     @ExceptionHandler(GeoPackageConverter.GeoPackageConversionError.class)
     @ResponseBody
     private String conversionFailedHandler(Exception ex, HttpServletResponse response) {
@@ -76,6 +134,11 @@ public class GeoPackageController {
         return String.format("Failed to convert to GPKG:\n\n%s", trace);
     }
 
+    /**
+     * Custom exception for handling a missing Piazza key.
+     * 
+     * Simple subclass of {@link RuntimeException}
+     */
     @SuppressWarnings("serial")
     public class MissingPiazzaKeyException extends RuntimeException {}
 
