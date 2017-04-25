@@ -2,7 +2,6 @@ package org.venice.beachfront.services;
 
 import java.util.function.Function;
 
-
 /**
  * Interface for a service to convert a JSON (GeoJSON) byte sequence 
  * to a SQLite (GPKG) byte sequence. Extends {@link Function} and
