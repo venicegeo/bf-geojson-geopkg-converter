@@ -1,0 +1,6 @@
+
+node ('sl61') { 
+    git url: 'https://github.com/venicegeo/bf-geojson-geopkg-converter.git, branch: 'master' 
+ 
+    stage 'archive'
+
