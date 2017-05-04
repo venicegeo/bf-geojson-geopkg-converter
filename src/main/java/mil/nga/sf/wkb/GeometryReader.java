@@ -178,11 +178,11 @@ public class GeometryReader {
 	 */
 	public static Point readPoint(ByteReader reader, boolean hasZ, boolean hasM) {
 
-		double x = reader.readDouble();
-		double y = reader.readDouble();
+		Double x = reader.readDouble();
+		Double y = reader.readDouble();
 
-		double z = hasZ ? reader.readDouble() : Double.NaN;
-		double m = hasM ? reader.readDouble() : Double.NaN;
+		Double z = hasZ ? reader.readDouble() : null;
+		Double m = hasM ? reader.readDouble() : null;
 
 		return new Point(x, y, z, m);
 	}

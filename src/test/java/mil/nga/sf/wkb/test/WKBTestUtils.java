@@ -526,11 +526,11 @@ public class WKBTestUtils {
 	 */
 	public static Point createPoint(boolean hasZ, boolean hasM) {
 
-		double x = Math.random() * 180.0 * (Math.random() < .5 ? 1 : -1);
-		double y = Math.random() * 90.0 * (Math.random() < .5 ? 1 : -1);
+		Double x = Math.random() * 180.0 * (Math.random() < .5 ? 1 : -1);
+		Double y = Math.random() * 90.0 * (Math.random() < .5 ? 1 : -1);
 
-		double z = hasZ ? Math.random() * 1000.0 : Double.NaN;
-		double m = hasM ? Math.random() * 1000.0 : Double.NaN;
+		Double z = hasZ ? Math.random() * 1000.0 : null;
+		Double m = hasM ? Math.random() * 1000.0 : null;
 		Point point = new Point(x, y, z, m);
 
 		return point;

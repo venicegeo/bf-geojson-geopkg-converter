@@ -1,6 +1,7 @@
 package mil.nga.geopackage.test.features.columns;
 
 import java.sql.SQLException;
+import java.util.Date;
 //import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -527,7 +528,7 @@ public class GeometryColumnsUtils {
 			contents.setDataType(ContentsDataType.FEATURES);
 			contents.setIdentifier("test_contents");
 			contents.setDescription("");
-//			contents.setLastChange(new Date());
+			contents.setLastChange(new Date());
 			contents.setMinX(-180.0);
 			contents.setMinY(-90.0);
 			contents.setMaxX(180.0);
