@@ -1,0 +1,16 @@
+@Library('pipelib@master') _
+node ('sl61') { 
+    
+    stage('Setup') {
+    git([
+      url: "https://github.com/venicegeo/bf-geojson-geopkg-converter",
+      branch: "master"
+    ])
+  }
+    
+   stage('Archive') {
+    sh './ci/archive.sh'
+    mavenPush()
+  }
+}
+
