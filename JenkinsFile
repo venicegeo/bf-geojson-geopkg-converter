@@ -1,4 +1,4 @@
-
+@Library('pipelib@master') _
 node ('sl61') { 
     
     stage('Setup') {
