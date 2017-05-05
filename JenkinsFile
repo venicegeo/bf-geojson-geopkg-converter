@@ -7,10 +7,11 @@ node ('sl61') {
       branch: "master"
     ])
   }
-    
+ 
+   withEnv(["PATH+MAVEN=${tool 'M3'}/bin"]){
    stage('Archive') {
-    sh './ci/archive.sh'
-    mavenPush()
+    sh 'mvn clean install' 
+   }
   }
 }
 
