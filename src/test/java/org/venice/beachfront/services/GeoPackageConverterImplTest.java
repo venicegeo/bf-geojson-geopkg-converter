@@ -1,24 +1,29 @@
 package org.venice.beachfront.services;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 
-import org.springframework.test.util.ReflectionTestUtils;
+import org.junit.Assert;
 
-import junit.framework.Assert;
 import junit.framework.TestCase;
 
 public class GeoPackageConverterImplTest extends TestCase {
     private GeoPackageConverter geoPackageConverter;
-    private byte[] mockGeoPackageData = "test-data".getBytes();
 
     @Override
     public void setUp() throws IOException {
-        this.geoPackageConverter = new GeoPackageConverterImpl(null);
-        ReflectionTestUtils.setField(this.geoPackageConverter, "emptyGeoPackageData", this.mockGeoPackageData);
+        this.geoPackageConverter = new GeoPackageConverterImpl();
     }
 
-    public void testDummyEmptyData() {
-        byte[] result = this.geoPackageConverter.apply(null);
-        Assert.assertEquals(new String(this.mockGeoPackageData), new String(result));
+    public void testData() throws URISyntaxException, IOException {
+    	processFile("LC80020522017095LGN00.geojson");
+    	processFile("taz10.geojson");
+    	processFile("fc-points.geojson");
+    }
+    private void processFile(String inFileName) throws URISyntaxException, IOException{
+		java.net.URL url = ClassLoader.getSystemResource(inFileName);
+		java.nio.file.Path resPath = java.nio.file.Paths.get(url.toURI());
+        byte[] result = this.geoPackageConverter.apply(java.nio.file.Files.readAllBytes(resPath));
+        Assert.assertNotNull(result);
     }
 }
