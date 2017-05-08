@@ -29,6 +29,12 @@ node ("sl61") {
     }
   }
 
+  stage("Maven Push geopackage-core") {
+    dir("./source-repos/core-java") {
+      //mavenPush()
+    }
+  }
+
   stage("Build geopackage") {
     dir("./source-repos/java") {
       git url: "https://github.com/venicegeo/geopackage-java.git"
