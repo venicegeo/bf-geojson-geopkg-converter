@@ -1,34 +1,39 @@
 @Library('pipelib@master') _
-node ('sl61') { 
-    
-    stage('Setup') {
-    git([
-      url: "https://github.com/venicegeo/bf-geojson-geopkg-converter",
-      branch: "master"
-    ])
+node ('sl61') {
+  stage('Setup/Clean') {
+    deleteDir()
+    sh "pwd"
+    sh "ls -al"
   }
- 
-    stage("Build geopackage") {                                                               
-      git url: "https://github.com/venicegeo/geopackage-java.git"
-        sh "pwd"                  
-         withEnv(["PATH+MAVEN=${tool "M3"}/bin"]) {                                 
-          sh "mvn clean install -DskipTests" 
-      }                                                                          
-    }    
 
-    stage("Build geopackage-wkb") {                                                
-      git url: "https://github.com/venicegeo/geopackage-wkb-java.git"
-        sh "pwd"                
-         withEnv(["PATH+MAVEN=${tool "M3"}/bin"]) {                                 
-          sh "mvn clean install -DskipTests"
-     }                                                                          
-   }     
+  stage("Build geopackage") {
+    git url: "https://github.com/venicegeo/geopackage-java.git"
+      sh "pwd"
+      withEnv(["PATH+MAVEN=${tool "M3"}/bin"]) {
+        //sh "mvn clean install -DskipTests"
+      }
+    }
 
-    stage("Build geopackage-core") {                                               
-      git url: "https://github.com/venicegeo/geopackage-core-java.git"             
-        sh "pwd"
-         withEnv(["PATH+MAVEN=${tool "M3"}/bin"]) {                                 
-          sh "mvn clean install" 
-      }                                                                          
-   }       
+  stage("Build geopackage-wkb") {
+    git url: "https://github.com/venicegeo/geopackage-wkb-java.git"
+      sh "pwd"
+      withEnv(["PATH+MAVEN=${tool "M3"}/bin"]) {
+        //sh "mvn clean install -DskipTests" 
+     }
+   }
+
+  stage("Build geopackage-core") {
+    git url: "https://github.com/venicegeo/geopackage-core-java.git"
+      sh "pwd"
+      withEnv(["PATH+MAVEN=${tool "M3"}/bin"]) {
+        //sh "mvn clean install"
+      }
+   }
+
+  stage("Build GGPKG Converter") {
+    git url: "https://github.com/venicegeo/bf-geojson-geopkg-converter",
+    branch: "master"
+      sh "pwd"
+  }
+
 }
