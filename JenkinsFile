@@ -17,51 +17,48 @@ node ("sl61") {
     }
   }
 
-  stage("Build geopackage-core") {
+  stage("Build/Push geopackage-core") {
     dir("./source-repos/core-java") {
       git url: "https://github.com/venicegeo/geopackage-core-java.git"
       sh "pwd"
       sh "ls -al"
       withEnv(["PATH+MAVEN=${tool "M3"}/bin"]) {
         //sh "mvn clean install"
-        sh "mvn clean package"
+        sh "mvn clean package -U"
+        mavenPush {
+          mavenArtifact 'target/geopackage-core*.jar'
+        }
       }
     }
   }
 
-  stage("Maven Push geopackage-core") {
-    dir("./source-repos/core-java") {
-      //mavenPush()
-    }
-  }
+  //stage("Build geopackage") {
+  //  dir("./source-repos/java") {
+  //    git url: "https://github.com/venicegeo/geopackage-java.git"
+  //      sh "pwd"
+  //      sh "ls -al"
+  //      withEnv(["PATH+MAVEN=${tool "M3"}/bin"]) {
+  //        //sh "mvn clean install -DskipTests"
+  //        sh "mvn clean package"
+  //      }
+  //  }
+  //}
 
-  stage("Build geopackage") {
-    dir("./source-repos/java") {
-      git url: "https://github.com/venicegeo/geopackage-java.git"
-        sh "pwd"
-        sh "ls -al"
-        withEnv(["PATH+MAVEN=${tool "M3"}/bin"]) {
-          //sh "mvn clean install -DskipTests"
-          sh "mvn clean package"
-        }
-    }
-  }
-
-  stage("Build geopackage-wkb") {
-    git url: "https://github.com/venicegeo/geopackage-wkb-java.git"
-      sh "pwd"
-      sh "ls -al"
-      withEnv(["PATH+MAVEN=${tool "M3"}/bin"]) {
-        //sh "mvn clean install -DskipTests"
-     }
-   }
+  //stage("Build geopackage-wkb") {
+  //  git url: "https://github.com/venicegeo/geopackage-wkb-java.git"
+  //    sh "pwd"
+  //    sh "ls -al"
+  //    withEnv(["PATH+MAVEN=${tool "M3"}/bin"]) {
+  //      //sh "mvn clean install -DskipTests"
+  //   }
+  // }
 
 
-  stage("Build GGPKG Converter") {
-    git url: "https://github.com/venicegeo/bf-geojson-geopkg-converter",
-    branch: "master"
-      sh "pwd"
-      sh "ls -al"
-  }
+  //stage("Build GGPKG Converter") {
+  //  git url: "https://github.com/venicegeo/bf-geojson-geopkg-converter",
+  //  branch: "master"
+  //    sh "pwd"
+  //    sh "ls -al"
+  //}
 
 }
