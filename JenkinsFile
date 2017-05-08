@@ -23,7 +23,7 @@ node ("sl61") {
     withEnv(["PATH+MAVEN=${tool "M3"}/bin"]) {
       sh "mvn clean package -U -DskipTests"
       mavenPush {
-        mavenArtifact='target/geopackage-wkb*.jar'
+        mavenArtifact = 'target/geopackage-wkb*.jar'
       }
     }
   }
@@ -37,7 +37,7 @@ node ("sl61") {
         //sh "mvn clean install"
         sh "mvn clean package -U -DskipTests"
         mavenPush {
-          mavenArtifact='target/geopackage-core*.jar'
+          mavenArtifact = 'target/geopackage-core*.jar'
         }
       }
     }
