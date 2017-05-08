@@ -17,6 +17,16 @@ node ("sl61") {
     }
   }
 
+  stage("Build geopackage-wkb") {
+    git url: "https://github.com/venicegeo/geopackage-wkb-java.git"
+    withEnv(["PATH+MAVEN=${tool "M3"}/bin"]) {
+      sh "mvn clean package -U"
+      mavenPush {
+        mavenArtifact 'target/geopackage-core*.jar'
+      }
+    }
+  }
+
   stage("Build/Push geopackage-core") {
     dir("./source-repos/core-java") {
       git url: "https://github.com/venicegeo/geopackage-core-java.git"
@@ -44,14 +54,6 @@ node ("sl61") {
   //  }
   //}
 
-  //stage("Build geopackage-wkb") {
-  //  git url: "https://github.com/venicegeo/geopackage-wkb-java.git"
-  //    sh "pwd"
-  //    sh "ls -al"
-  //    withEnv(["PATH+MAVEN=${tool "M3"}/bin"]) {
-  //      //sh "mvn clean install -DskipTests"
-  //   }
-  // }
 
 
   //stage("Build GGPKG Converter") {
