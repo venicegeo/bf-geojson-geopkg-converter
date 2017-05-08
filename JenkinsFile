@@ -1,7 +1,7 @@
 @Library('pipelib@master') _
 node ("sl61") {
 
-  stag("Clean") {
+  stage("Clean") {
     deleteDir()
     sh "pwd"
     sh "ls -al"
