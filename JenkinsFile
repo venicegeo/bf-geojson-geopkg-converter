@@ -20,7 +20,7 @@ node ("sl61") {
   stage("Build geopackage-wkb") {
     git url: "https://github.com/venicegeo/geopackage-wkb-java.git"
     withEnv(["PATH+MAVEN=${tool "M3"}/bin"]) {
-      sh "mvn clean package -U"
+      sh "mvn clean package -U -DskipTests"
       mavenPush {
         mavenArtifact 'target/geopackage-core*.jar'
       }
@@ -34,7 +34,7 @@ node ("sl61") {
       sh "ls -al"
       withEnv(["PATH+MAVEN=${tool "M3"}/bin"]) {
         //sh "mvn clean install"
-        sh "mvn clean package -U"
+        sh "mvn clean package -U -DskipTests"
         mavenPush {
           mavenArtifact 'target/geopackage-core*.jar'
         }
