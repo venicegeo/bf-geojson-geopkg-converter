@@ -38,6 +38,8 @@ node ("sl61") {
         sh "mvn clean package -U -DskipTests"
         mavenPush {
           mavenArtifact = 'target/geopackage-core*.jar'
+          app = 'bf-geojson-geopkg-converter'
+          mavenProject = 'beachfront'
         }
       }
     }
