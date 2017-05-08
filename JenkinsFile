@@ -1,26 +1,39 @@
 @Library('pipelib@master') _
-node ('sl61') {
-  stage('Setup/Clean') {
+node ("sl61") {
+
+  stag("Clean") {
     deleteDir()
     sh "pwd"
     sh "ls -al"
   }
 
-  stage("Build geopackage") {
-    git url: "https://github.com/venicegeo/geopackage-java.git"
-      sh "pwd"
-      sh "ls -al"
-      withEnv(["PATH+MAVEN=${tool "M3"}/bin"]) {
-        //sh "mvn clean install -DskipTests"
-      }
+  stage("Setup") {
+    sh "mkdir -p source-repos"
+    dir("./source-repos") {
+      sh "mkdir -p java"
+      sh "mkdir -p wkb"
+      sh "mkdir -p core-java"
+      sh "mkdir bf-converter"
     }
+  }
+
+  stage("Build geopackage") {
+    dir("./source-repos/java") {
+      git url: "https://github.com/venicegeo/geopackage-java.git"
+        sh "pwd"
+        sh "ls -al"
+        withEnv(["PATH+MAVEN=${tool "M3"}/bin"]) {
+          //sh "mvn clean install -DskipTests"
+        }
+    }
+  }
 
   stage("Build geopackage-wkb") {
     git url: "https://github.com/venicegeo/geopackage-wkb-java.git"
       sh "pwd"
       sh "ls -al"
       withEnv(["PATH+MAVEN=${tool "M3"}/bin"]) {
-        //sh "mvn clean install -DskipTests" 
+        //sh "mvn clean install -DskipTests"
      }
    }
 
