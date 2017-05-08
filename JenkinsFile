@@ -26,6 +26,7 @@ node ("sl61") {
         mavenArtifact = 'target/geopackage-wkb*.jar'
         app = 'geopackage-wkb-java'
         mavenProject = 'beachfront'
+        packaging = '.jar'
       }
     }
   }
@@ -42,6 +43,7 @@ node ("sl61") {
           mavenArtifact = 'target/geopackage-core*.jar'
           app = 'bf-geojson-geopkg-converter'
           mavenProject = 'beachfront'
+          packaging = '.jar'
         }
       }
     }
