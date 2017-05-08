@@ -24,6 +24,7 @@ node ("sl61") {
         sh "ls -al"
         withEnv(["PATH+MAVEN=${tool "M3"}/bin"]) {
           //sh "mvn clean install -DskipTests"
+          sh "mvn clean package"
         }
     }
   }
