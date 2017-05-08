@@ -1,3 +1,4 @@
+#!/usr/bin/groovy
 @Library('pipelib@master') _
 node ("sl61") {
 
