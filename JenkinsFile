@@ -23,6 +23,7 @@ node ("sl61") {
       git url: "https://github.com/venicegeo/geopackage-wkb-java.git"
       withEnv(["PATH+MAVEN=${tool "M3"}/bin"]) {
         sh "mvn clean package -U -DskipTests"
+        sh "pwd"
         sh "ls -al target/"
         mavenPush {
           mavenArtifact = 'target/wkb-*.jar'
