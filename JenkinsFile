@@ -18,11 +18,12 @@ node ("sl61") {
     }
   }
 
-  stage("Build geopackage-wkb") {
+  stage("Build/Push geopackage-wkb") {
     dir("./source-repos/wkb") {
       git url: "https://github.com/venicegeo/geopackage-wkb-java.git"
       withEnv(["PATH+MAVEN=${tool "M3"}/bin"]) {
         sh "mvn clean package -U -DskipTests"
+        sh "ls -al targe/"
         mavenPush {
           mavenArtifact = 'target/wkb-*.jar'
           app = 'geopackage-wkb-java'
@@ -48,7 +49,7 @@ node ("sl61") {
     }
   }
 
-  //stage("Build geopackage") {
+  //stage("Build/Deploye geopackage-java") {
   //  dir("./source-repos/java") {
   //    git url: "https://github.com/venicegeo/geopackage-java.git"
   //      sh "pwd"
