@@ -19,14 +19,16 @@ node ("sl61") {
   }
 
   stage("Build geopackage-wkb") {
-    git url: "https://github.com/venicegeo/geopackage-wkb-java.git"
-    withEnv(["PATH+MAVEN=${tool "M3"}/bin"]) {
-      sh "mvn clean package -U -DskipTests"
-      mavenPush {
-        mavenArtifact = 'target/wkb-*.jar'
-        app = 'geopackage-wkb-java'
-        mavenProject = 'beachfront'
-        packaging = '.jar'
+    dir("./source-repos/wkb") {
+      git url: "https://github.com/venicegeo/geopackage-wkb-java.git"
+      withEnv(["PATH+MAVEN=${tool "M3"}/bin"]) {
+        sh "mvn clean package -U -DskipTests"
+        mavenPush {
+          mavenArtifact = 'target/wkb-*.jar'
+          app = 'geopackage-wkb-java'
+          mavenProject = 'beachfront'
+          packaging = '.jar'
+        }
       }
     }
   }
@@ -34,10 +36,7 @@ node ("sl61") {
   stage("Build/Push geopackage-core") {
     dir("./source-repos/core-java") {
       git url: "https://github.com/venicegeo/geopackage-core-java.git"
-      sh "pwd"
-      sh "ls -al"
       withEnv(["PATH+MAVEN=${tool "M3"}/bin"]) {
-        //sh "mvn clean install"
         sh "mvn clean package -U -DskipTests"
         mavenPush {
           mavenArtifact = 'target/geopackage-core*.jar'
