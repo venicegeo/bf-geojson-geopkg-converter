@@ -42,7 +42,7 @@
         <dependency>
             <groupId>mil.nga.geopackage</groupId>
             <artifactId>geopackage</artifactId>
-            <version>1.2.2-SF-SNAPSHOT</version>
+            <version>1.2.3-SF-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.jayway.jsonpath</groupId>
