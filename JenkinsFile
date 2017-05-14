@@ -7,10 +7,28 @@ node ('sl61') {
       branch: "master"
     ])
   }
-    
-   stage('Archive') {
-    sh './ci/archive.sh'
-    mavenPush()
-  }
-}
+ 
+    stage("Build geopackage") {                                                               
+      git url: "https://github.com/venicegeo/geopackage-java.git"
+        sh "pwd"                  
+         withEnv(["PATH+MAVEN=${tool "M3"}/bin"]) {                                 
+          sh "mvn clean install -DskipTests" 
+      }                                                                          
+    }    
 
+    stage("Build geopackage-wkb") {                                                
+      git url: "https://github.com/venicegeo/geopackage-wkb-java.git"
+        sh "pwd"                
+         withEnv(["PATH+MAVEN=${tool "M3"}/bin"]) {                                 
+          sh "mvn clean install -DskipTests"
+     }                                                                          
+   }     
+
+    stage("Build geopackage-core") {                                               
+      git url: "https://github.com/venicegeo/geopackage-core-java.git"             
+        sh "pwd"
+         withEnv(["PATH+MAVEN=${tool "M3"}/bin"]) {                                 
+          sh "mvn clean install" 
+      }                                                                          
+   }       
+}
