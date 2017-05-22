@@ -26,7 +26,7 @@ node ("sl61") {
         sh "pwd"
         sh "ls -al target/"
         mavenPush {
-          mavenArtifact = 'wkb-*-SNAPSHOT.jar '
+          mavenArtifact = 'target/wkb-1.2.1-SF-SNAPSHOT.jar '
           app = 'geopackage-wkb-java'
           mavenProject = 'beachfront'
           packaging = '.jar'
@@ -41,7 +41,7 @@ node ("sl61") {
       withEnv(["PATH+MAVEN=${tool "M3"}/bin"]) {
         sh "mvn clean package -U -DskipTests"
         mavenPush {
-          mavenArtifact = 'geopackage-core*.jar'
+          mavenArtifact = 'target/geopackage-core*.jar'
           app = 'bf-geojson-geopkg-converter'
           mavenProject = 'beachfront'
           packaging = '.jar'
