@@ -87,7 +87,20 @@
       sh "mvn clean install"
       sh "pwd"
       sh "ls -al target/"
-    
+       mavenPush { 
+         mavenArtifact = 'target/geojsongpkgconverter-1.0-SNAPSHOT.jar' 
+           app = 'ggpkg-converter' 
+           packaging = '.jar' 
+           mavenRepoHost= 'nexus.devops.geointservices.io'
+           mavenRepo = 'venicegeo'
+           mavenRepoId = 'nexus'
+           mavenOrg = 'venice'
+           mavenOrgType = 'org'
+           mavenProject = 'beachfront'
+           mavenSettingsFileId = 'maven_pipelib'
+           mavenPath = '/content/repositories'
+           mavenProtocol = 'https'
+        }    
           
       }
    }
