@@ -1,5 +1,5 @@
 @Library('pipelib@master') _ 
- node ("sl61") { 
+ node { 
  
  
    stage("Clean") { 
