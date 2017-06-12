@@ -13,7 +13,6 @@ import org.springframework.context.annotation.PropertySource;
  * @version 1.0
  */
 @SpringBootApplication
-@PropertySource("classpath:strings.properties")
 public class Application {
     public static void main( String[] args )
     {
