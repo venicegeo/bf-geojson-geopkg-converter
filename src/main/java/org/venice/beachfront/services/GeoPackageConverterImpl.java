@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -36,36 +37,37 @@ import mil.nga.sf.geojson.GeoJsonObject;
  *
  * @version 1.0
  */
+@Primary
 @Service
 public class GeoPackageConverterImpl implements GeoPackageConverter {
     /**
      * Perform the actual conversion from GeoJSON to GPKG.
-     * 
+     *
      * @param geojson A byte array containing GeoJSON data
-     * @return A byte array containing GPKG data 
+     * @return A byte array containing GPKG data
      */
     public byte[] apply(byte[] geojson) {
     	byte[] result;
-    	
+
         try {
     		String json = new String(geojson);
     		ObjectMapper mapper = new ObjectMapper();
     		FeatureCollection fc = (FeatureCollection)mapper.readValue(json, GeoJsonObject.class);
     		Map<String, String> propertiesMap = fc.getPropertiesMap();
-    		
+
     		File newGeoPackage = File.createTempFile("Converted", ".gpkg");
     		newGeoPackage.delete();
 
     		// Create a new GeoPackage
     		GeoPackageManager.create(newGeoPackage);
-    		
+
 //    		// Open a GeoPackage
     		try (
 				GeoPackage geoPackage = GeoPackageManager.open(newGeoPackage);
-    		){	
+    		){
     			SpatialReferenceSystemDao srsd = geoPackage.getSpatialReferenceSystemDao();
     			SpatialReferenceSystem srs4326 = srsd.getOrCreate(4326);
-    			
+
     			geoPackage.createGeometryColumnsTable();
     			GeometryColumnsDao geometryColumnsDao = geoPackage.getGeometryColumnsDao();
 
@@ -76,10 +78,10 @@ public class GeoPackageConverterImpl implements GeoPackageConverter {
     				columns.add(FeatureColumn.createColumn(index++, propertyName, GeoPackageDataType.fromName(propertiesMap.get(propertyName)), false, null));
     			}
     			columns.add(FeatureColumn.createGeometryColumn(index++, "geom", fc.getGeometryType(), false, null));
-    			
+
     			FeatureTable table = new FeatureTable("geojson", columns);
     			geoPackage.createFeatureTable(table);
-    			
+
     			ContentsDao contentsDao = geoPackage.getContentsDao();
     			Contents contents = new Contents();
     			contents.setDataType(ContentsDataType.FEATURES);
@@ -88,16 +90,16 @@ public class GeoPackageConverterImpl implements GeoPackageConverter {
     			contents.setTableName("geojson");
     			contents.setSrs(srs4326);
     			contents.setLastChange(new Date());
-    			
+
     			GeometryColumns geometryColumns = new GeometryColumns();
     			geometryColumns.setContents(contents);
     			geometryColumns.setColumnName("geom");
     			geometryColumns.setGeometryType(fc.getGeometryType());
     			geometryColumns.setSrs(srs4326);
-    			
+
     			contentsDao.create(contents);
     			geometryColumnsDao.create(geometryColumns);
-    			
+
     			FeatureDao featureDao = geoPackage.getFeatureDao(contents);
     			for (Feature feature : fc.getFeatures()) {
         			FeatureRow featureRow = featureDao.newRow();

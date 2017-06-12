@@ -8,7 +8,10 @@ import java.util.concurrent.Future;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.venice.beachfront.services.GeoPackageConverter;
 import org.venice.beachfront.services.PiazzaApi;
 
@@ -86,6 +90,7 @@ public class GeoPackageController {
         final HttpServletResponse response
     ) {
         return CompletableFuture.supplyAsync(() -> {
+        	System.err.println("key "+ pzKey);
             if (pzKey.length() < 1) {
                 throw new MissingPiazzaKeyException();
             }
@@ -109,29 +114,32 @@ public class GeoPackageController {
      * @return String error message to return to the client
      */
     @ExceptionHandler(MissingPiazzaKeyException.class)
-    @ResponseBody
-    private String missingPiazzaKeyHandler(HttpServletResponse response) {
-        response.setStatus(HttpStatus.BAD_REQUEST.value());
-        return "Missing `pzApi` query parameter.";
+    private ResponseEntity<String> missingPiazzaKeyHandler(HttpServletResponse response) {
+    	HttpHeaders headers = new HttpHeaders();
+    	headers.setContentType(MediaType.TEXT_PLAIN);
+
+        return new ResponseEntity<String>("Missing `pzKey` query parameter.\n", headers, HttpStatus.BAD_REQUEST);
     }
 
     /**
      * Handler for errors during the GeoJSON to GPKG conversion.
      * 
      * General handler for a server error during the conversion.
-     * As a side efect, sets the response status code to 500 Server Error.
+     * As a side effect, sets the response status code to 500 Server Error.
      * 
      * @param response {@link HttpServletResponse} response object
      * @return String error message to return to the client
      */
     @ExceptionHandler(GeoPackageConverter.GeoPackageConversionError.class)
-    @ResponseBody
-    private String conversionFailedHandler(Exception ex, HttpServletResponse response) {
+    private ResponseEntity<String> conversionFailedHandler(Exception ex, HttpServletResponse response) {
         StringWriter traceWriter = new StringWriter();
         ex.printStackTrace(new PrintWriter(traceWriter));
         String trace = traceWriter.getBuffer().toString();
-        response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-        return String.format("Failed to convert to GPKG:\n\n%s", trace);
+        String responseText = String.format("Failed to convert to GPKG:\n\n%s\n", trace);
+
+    	HttpHeaders headers = new HttpHeaders();
+    	headers.setContentType(MediaType.TEXT_PLAIN);
+        return new ResponseEntity<String>(responseText, headers, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     /**
