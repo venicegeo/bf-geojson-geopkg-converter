@@ -90,7 +90,6 @@ public class GeoPackageController {
         final HttpServletResponse response
     ) {
         return CompletableFuture.supplyAsync(() -> {
-        	System.err.println("key "+ pzKey);
             if (pzKey.length() < 1) {
                 throw new MissingPiazzaKeyException();
             }
