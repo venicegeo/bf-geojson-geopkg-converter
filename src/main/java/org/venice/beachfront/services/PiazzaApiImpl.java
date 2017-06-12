@@ -31,13 +31,14 @@ public class PiazzaApiImpl implements PiazzaApi {
      * Create a new Piazza API Service.
      * 
      * @param piazzaUrl The base URL at which the Piazza API is located;
-     *                  injected by Spring from the {@code piazza.url} runtime property
+     *                  injected by Spring from the {@code PIAZZA_URL} environment
+     *                  variable
      * @param requestFactory The HTTP request factory to use to create the
      *                       requests to the API
      */
     @Autowired
     public PiazzaApiImpl(
-            @Value("${piazza.url}") String piazzaUrl,
+            @Value("${PIAZZA_URL}") String piazzaUrl,
             PiazzaApi.HttpRequestFactory requestFactory
         ) {
         this.piazzaUrl = piazzaUrl;
