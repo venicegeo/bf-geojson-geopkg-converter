@@ -2,7 +2,7 @@ applications:
 - name: bf-geojson-geopkg-converter
   host: bf-geojson-geopkg-converter
   path: geojsongpkgconverter.jar
-  buildpack: 'https://github.com/cloudfoundry/java-buildpack.git#v3.9'
+  buildpack: java_buildpack
   memory: 2048M
   instances: 1
   timeout: 180
