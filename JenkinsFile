@@ -104,8 +104,10 @@
           
       }
    }
+   
    stage("CI Deploy") {
-         cfPush()
+     sh "ls -al target/" 
+     sh "mv target/geopackage-1.2.3-SF-SNAPSHOT.jar geojsongpkgconverter.jar"        cfPush()
    }
 }
 
