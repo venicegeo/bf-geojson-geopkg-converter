@@ -108,7 +108,7 @@
    stage("CI Deploy") {
      sh "ls -al target/" 
      sh "mv target/geojsongpkgconverter-1.0-SNAPSHOT.jar geojsongpkgconverter.jar"
-     sh "cf push geojsongpkgconverter-a903101 -f /jslave/workspace/venice/beachfront/bf-geojson-geopkg-converter-pipeline/manifest.test.yml --hostname geojsongpkgconverter-a903101 -d test.geointservices.io"
+     sh "cd /jslave/workspace/venice/beachfront/bf-geojson-geopkg-converter-pipeline/ && ls -a && cf push geojsongpkgconverter-a903101 -f /jslave/workspace/venice/beachfront/bf-geojson-geopkg-converter-pipeline/manifest.test.yml --hostname geojsongpkgconverter-a903101 -d test.geointservices.io"
         //cfPush()
    }
 }
