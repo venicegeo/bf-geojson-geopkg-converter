@@ -107,7 +107,8 @@
    
    stage("CI Deploy") {
      sh "ls -al target/" 
-     sh "mv target/geopackage-1.2.3-SF-SNAPSHOT.jar geojsongpkgconverter.jar"        cfPush()
+     sh "mv target/geojsongpkgconverter-1.0-SNAPSHOT.jar geojsongpkgconverter.jar"        
+        cfPush()
    }
 }
 
