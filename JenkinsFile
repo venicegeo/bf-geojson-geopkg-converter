@@ -60,7 +60,7 @@
      git url: "https://github.com/venicegeo/geopackage-java.git"
         withEnv(["PATH+MAVEN=${tool "M3"}/bin"]) {
        
-          sh "mvn clean install"
+          sh "mvn clean install -DskipTests"
           sh "pwd"
           sh "ls -al target/"
          mavenPush { 
