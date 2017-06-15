@@ -7,3 +7,5 @@ applications:
   disk_quota: 1G
   instances: 1
   buildpack: java_buildpack
+  env:
+    PIAZZA_URL: __PIAZZA_URL__
