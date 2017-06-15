@@ -6,4 +6,6 @@ applications:
   memory: 1G
   disk_quota: 1G
   instances: 1
+  env:
+    PIAZZA_URL: __PIAZZA_URL__
 
