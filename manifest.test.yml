@@ -3,6 +3,7 @@ applications:
   host: bf-geojson-geopkg-converter
   path: geojsongpkgconverter.jar
   buildpack: java_buildpack
-  memory: 2048M
+  memory: 1G
+  disk_quota: 1G
   instances: 1
   timeout: 180
