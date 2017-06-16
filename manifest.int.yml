@@ -2,7 +2,7 @@ pplications:
 - name: bf-geojson-geopkg-converter
   host: bf-geojson-geopkg-converter
   path: geojsongpkgconverter.jar
-  buildpack: java_buildpack
+  buildpack: https://github.com/cloudfoundry/java-buildpack.git#v3.9
   memory: 1G
   disk_quota: 1G
   instances: 1
