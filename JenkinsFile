@@ -115,7 +115,7 @@
 
  stage("CI Deploy-Int-Stage") {
      sh "ls -al target/"
-    sh "mv target/geojsongpkgconverter-1.0-SNAPSHOT.jar.original geojsongpkgconverter.jar"
+    //sh "mv target/geojsongpkgconverter-1.0-SNAPSHOT.jar.original geojsongpkgconverter.jar"
         cfPush {
         cfSpace = 'int'
        }       
