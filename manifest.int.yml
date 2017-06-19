@@ -4,7 +4,7 @@ applications:
    host: bf-geojson-geopkg-converter 
    path: geojsongpkgconverter.jar 
    buildpack: java_buildpack 
-   cfDomain: int.geointservices.io 
+   domain: int.geointservices.io 
    cfOr: piazza 
    cfSpace: int 
    ldapCredentialId: ldap_baxtersh 
