@@ -110,6 +110,7 @@
      sh "mv target/geojsongpkgconverter-1.0-SNAPSHOT.jar geojsongpkgconverter.jar"
      sh "export CF_TRACE=true"
         cfPush()
+        cfBgDeploy()
    }
 }
 
