@@ -1,18 +1,13 @@
 
 applications:
--name: bf-geojson-geopkg-converter 
-   host: bf-geojson-geopkg-converter 
-   path: geojsongpkgconverter.jar 
-   buildpack: java_buildpack 
-   domain: int.geointservices.io 
-   cfOr: piazza 
-   cfSpace: int 
-   ldapCredentialId: ldap_baxtersh 
-   cfSkipSsl: true 
-   memory: 1G 
-   disk_quota: 1G 
-   instances: 1 
-   env: 
+- name: bf-geojson-geopkg-converter 
+  host: bf-geojson-geopkg-converter 
+  path: geojsongpkgconverter.jar 
+  buildpack: java_buildpack 
+  memory: 1G 
+  disk_quota: 1G 
+  instances: 1 
+  env: 
      PIAZZA_URL: __PIAZZA_URL__ 
  
  
