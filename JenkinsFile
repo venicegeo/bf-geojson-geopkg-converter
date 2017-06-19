@@ -105,19 +105,20 @@
       }
    }
    
-  // stage("CI Deploy-Test-Stage") {
-  //   sh "ls -al target/" 
- //    sh "mv target/geojsongpkgconverter-1.0-SNAPSHOT.jar geojsongpkgconverter.jar"
-  //   sh "export CF_TRACE=true"
-   //     cfPush()
-   //     cfBgDeploy()
-  // }
+   stage("CI Deploy-Test-Stage") {
+     sh "ls -al target/" 
+     sh "mv target/geojsongpkgconverter-1.0-SNAPSHOT.jar geojsongpkgconverter.jar"
+     sh "export CF_TRACE=true"
+       cfPush()
+       cfBgDeploy()
+   }
 
  stage("CI Deploy-Int-Stage") {
      sh "ls -al target/"
-     sh "mv target/geojsongpkgconverter-1.0-SNAPSHOT.jar geojsongpkgconverter.jar"
-        cfPush()
-        cfBgDeploy()
+  //   sh "mv target/geojsongpkgconverter-1.0-SNAPSHOT.jar geojsongpkgconverter.jar"
+        cfPush {
+        cfSpace = 'int'
+       }       
    }
 }
 
