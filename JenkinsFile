@@ -110,7 +110,7 @@
      sh "mv target/geojsongpkgconverter-1.0-SNAPSHOT.jar geojsongpkgconverter.jar"
      sh "export CF_TRACE=true"
        cfPush()
-       sh "sed -i manifest.test.yml 's/__PIAZZA_URL/piazza.<PCF_SPACE>.geointservices.io/'"
+       sh "sed -i manifest.test.yml 's/__PIAZZA_URL/piazza.test.geointservices.io/'"
        cfBgDeploy()
    }
 
