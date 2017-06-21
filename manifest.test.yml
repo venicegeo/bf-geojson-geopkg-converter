@@ -7,5 +7,5 @@ applications:
   disk_quota: 1G
   instances: 1
   env:
-    PIAZZA_URL: http://piazza.test.geointservices.io
+    PIAZZA_URL: __PIAZZA_URL__ 
 
