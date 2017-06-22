@@ -115,13 +115,13 @@
     }
   
 
-// stage("CI Deploy-Int-Stage") {
-//     sh "ls -al target/"
+  stage("CI Deploy-Int-Stage") {
+     sh "ls -al target/"
     //sh "mv target/geojsongpkgconverter-1.0-SNAPSHOT.jar.original geojsongpkgconverter.jar"
-//        cfPush {
-//        cfSpace = 'int'
-//       }       
-//   }
+       cfPush {
+       cfSpace = 'int'
+      }       
+   }
 }
 
 
