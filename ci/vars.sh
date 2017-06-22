@@ -1,4 +1,4 @@
 #!/bin/bash
 
-APP=geojsongpkgconverter
+APP=bf-geojson-geopkg-converter
 EXT=jar
