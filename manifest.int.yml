@@ -1,0 +1,11 @@
+applications:
+- name: bf-geojson-geopkg-converter
+  host: bf-geojson-geopkg-converter
+  path: geojsongpkgconverter.jar
+  buildpack: java_buildpack
+  memory: 1G
+  disk_quota: 1G
+  instances: 1
+  env:
+    PIAZZA_URL: __PIAZZA_URL__ 
+
