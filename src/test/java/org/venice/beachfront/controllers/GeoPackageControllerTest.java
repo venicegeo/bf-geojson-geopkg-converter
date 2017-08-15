@@ -9,6 +9,7 @@ import org.mockito.Mockito;
 import org.venice.beachfront.services.GeoPackageConverter;
 import org.venice.beachfront.services.PiazzaApi;
 
+import junit.framework.Assert;
 import junit.framework.TestCase;
 
 
@@ -39,9 +40,9 @@ public class GeoPackageControllerTest extends TestCase {
     public void testControllerRequiresPiazzaKey() throws ExecutionException, InterruptedException {
         try {
             byte[] result = this.controller.convertToGeoPackage(this.mockItemId, "", this.mockResponse).get();
-            TestCase.fail(String.format("Expected error for missing Piazza key, got %s", new String(result)));
+            Assert.fail(String.format("Expected error for missing Piazza key, got %s", new String(result)));
         } catch (ExecutionException e) {
-            TestCase.assertEquals(
+            Assert.assertEquals(
                 GeoPackageController.MissingPiazzaKeyException.class, 
                 e.getCause().getClass());
         }
@@ -54,9 +55,9 @@ public class GeoPackageControllerTest extends TestCase {
 
         try {
             byte[] result = this.controller.convertToGeoPackage(this.mockItemId, this.mockPzApiKey, this.mockResponse).get();
-            TestCase.fail(String.format("Expected error due to failed conversion, got %s", new String(result)));
+            Assert.fail(String.format("Expected error due to failed conversion, got %s", new String(result)));
         } catch (ExecutionException e) {
-        	TestCase.assertEquals(
+            Assert.assertEquals(
                 GeoPackageConverter.GeoPackageConversionError.class, 
                 e.getCause().getClass());
         }
@@ -64,7 +65,7 @@ public class GeoPackageControllerTest extends TestCase {
 
     public void testCorrectMockedOutput() throws ExecutionException, InterruptedException {
         byte[] result = this.controller.convertToGeoPackage(this.mockItemId, this.mockPzApiKey, this.mockResponse).get();
-        TestCase.assertEquals(new String(this.mockResultSqlite), new String(result));
+        Assert.assertEquals(new String(this.mockResultSqlite), new String(result));
     }
 
     public void testCorrectHeaderSideEffect() throws ExecutionException, InterruptedException {
