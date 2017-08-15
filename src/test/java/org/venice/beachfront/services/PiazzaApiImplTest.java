@@ -1,13 +1,12 @@
 package org.venice.beachfront.services;
 
 import org.venice.beachfront.services.PiazzaApi;
-import org.venice.beachfront.services.PiazzaApi.HttpRequestFailedException;
+import org.venice.beachfront.services.PiazzaApi.RestTemplateFactory;
 import org.venice.beachfront.services.PiazzaApiImpl;
-
-import com.github.kevinsawicki.http.HttpRequest.Base64;
 
 import junit.framework.TestCase;
 
+import java.util.Base64;
 import java.util.concurrent.ExecutionException;
 
 import org.mockito.Mockito;
@@ -23,7 +22,7 @@ public class PiazzaApiImplTest extends TestCase {
 	protected PiazzaApi piazzaApi;
 	private String mockId = "Feature-ID-1234";
 	private String mockPzKey = "Pz-Key-5678";
-	private String mockAuthorization = "Basic " + Base64.encode(this.mockPzKey + ":");
+	private String mockAuthorization = "Basic " + Base64.getEncoder().encodeToString((this.mockPzKey + ":").getBytes());
 	private String mockPiazzaUrl = "http://fake-url.localdomain";
 	private String mockRequestBody = this.mockId + " " + this.mockPzKey;
 	private String mockAuthorizationFailedMessage = "Authorization failed";
@@ -47,7 +46,7 @@ public class PiazzaApiImplTest extends TestCase {
 					}
 				});
 
-		PiazzaApi.RestTemplateFactory factory = Mockito.mock(PiazzaApi.RestTemplateFactory.class);
+		PiazzaApi.RestTemplateFactory factory = (RestTemplateFactory) Mockito.mock(PiazzaApi.RestTemplateFactory.class);
 		Mockito.when(factory.getRestTemplate()).thenReturn(this.mockRestTemplate);
 
 		this.piazzaApi = new PiazzaApiImpl(this.mockPiazzaUrl, factory);
@@ -70,7 +69,7 @@ public class PiazzaApiImplTest extends TestCase {
 			TestCase.fail("Expected API call to fail, it did not");
 		} catch (ExecutionException e) {
 			TestCase.assertEquals(e.getCause().getClass(), PiazzaApi.HttpRequestFailedException.class);
-			PiazzaApi.HttpRequestFailedException httpExc = (HttpRequestFailedException) e.getCause();
+			PiazzaApi.HttpRequestFailedException httpExc = (PiazzaApi.HttpRequestFailedException) e.getCause();
 			TestCase.assertEquals(this.mockAuthorizationFailedMessage,
 					new String(httpExc.getResponseEntity().getBody()));
 		}

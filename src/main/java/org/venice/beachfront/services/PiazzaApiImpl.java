@@ -1,5 +1,6 @@
 package org.venice.beachfront.services;
 
+import java.util.Base64;
 import java.util.concurrent.CompletableFuture;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,8 +12,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-
-import com.github.kevinsawicki.http.HttpRequest.Base64;
 
 /**
  * Implementation of a Piazza API service for interfacing with a Piazza API
@@ -120,7 +119,7 @@ public class PiazzaApiImpl implements PiazzaApi {
 	 * @param password
 	 */
 	private static void applyBasicAuthorizationHeaders(HttpHeaders headers, String username, String password) {
-		String headerValue = "Basic " + Base64.encode(username + ":" + password);
+		String headerValue = "Basic " + Base64.getEncoder().encodeToString((username + ":" + password).getBytes());
 		headers.set("Authorization", headerValue);
 	}
 }
