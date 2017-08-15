@@ -1,6 +1,7 @@
 package org.venice.beachfront.services;
 
 import org.venice.beachfront.services.PiazzaApi;
+import org.venice.beachfront.services.PiazzaApi.RestTemplateFactory;
 import org.venice.beachfront.services.PiazzaApiImpl;
 
 import junit.framework.TestCase;
