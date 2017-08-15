@@ -6,6 +6,8 @@ import java.util.concurrent.ExecutionException;
 import javax.servlet.http.HttpServletResponse;
 
 import org.mockito.Mockito;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.venice.beachfront.services.GeoPackageConverter;
 import org.venice.beachfront.services.PiazzaApi;
 
@@ -20,6 +22,8 @@ public class GeoPackageControllerTest extends TestCase {
 
     String mockItemId = "Piazza-Mock-Item-Id-123";
     String mockPzApiKey = "Piazza-Mock-API-Key-456";
+    String mockBadPzApiKey = "BOGUS_KEY";
+    String mockUnauthorizedHttpBody = "401 Unauthorized";
     byte[] mockGeoJSON = "{}".getBytes();
     byte[] mockResultSqlite = "sample sqlite".getBytes();
 
@@ -27,6 +31,8 @@ public class GeoPackageControllerTest extends TestCase {
         this.mockPiazzaApi = Mockito.mock(PiazzaApi.class);
         Mockito.when(this.mockPiazzaApi.getGeoJSON(this.mockItemId, this.mockPzApiKey))
             .thenReturn(CompletableFuture.completedFuture(mockGeoJSON));
+        Mockito.when(this.mockPiazzaApi.getGeoJSON(this.mockItemId, this.mockBadPzApiKey))
+        	.thenThrow(new PiazzaApi.HttpRequestFailedException(new ResponseEntity<byte[]>(this.mockUnauthorizedHttpBody.getBytes(), HttpStatus.UNAUTHORIZED)));
 
         this.mockGeoPackageConverter = Mockito.mock(GeoPackageConverter.class);
         Mockito.when(this.mockGeoPackageConverter.apply(this.mockGeoJSON))
@@ -74,5 +80,5 @@ public class GeoPackageControllerTest extends TestCase {
             Mockito.eq("Content-disposition"), 
             Mockito.eq(String.format("attachment; filename=%s.gpkg", this.mockItemId))
         );
-    } 
+    }
 }

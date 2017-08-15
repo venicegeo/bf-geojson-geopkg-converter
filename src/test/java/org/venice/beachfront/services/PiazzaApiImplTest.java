@@ -5,6 +5,7 @@ import org.venice.beachfront.services.PiazzaApiImpl;
 
 import junit.framework.TestCase;
 
+import java.nio.charset.Charset;
 import java.util.Base64;
 import java.util.concurrent.ExecutionException;
 
@@ -15,6 +16,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpEntity;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 public class PiazzaApiImplTest extends TestCase {
@@ -41,8 +43,7 @@ public class PiazzaApiImplTest extends TestCase {
 						if (requestEntity.getHeaders().getFirst("Authorization").equals(mockAuthorization)) {
 							return new ResponseEntity<byte[]>(mockRequestBody.getBytes(), HttpStatus.OK);
 						}
-						return new ResponseEntity<byte[]>(mockAuthorizationFailedMessage.getBytes(),
-								HttpStatus.UNAUTHORIZED);
+						throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED, "Unauthorized", mockAuthorizationFailedMessage.getBytes(), Charset.defaultCharset());
 					}
 				});
 

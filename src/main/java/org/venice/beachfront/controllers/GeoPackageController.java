@@ -103,13 +103,11 @@ public class GeoPackageController {
 	 * Handler for missing the "pzApi" URL parameter.
 	 * 
 	 * As a side effect, sets the response status code to 400 Bad Request.
-	 * 
-	 * @param response
-	 *            {@link HttpServletResponse} response object
+	 *
 	 * @return String error message to return to the client
 	 */
 	@ExceptionHandler(MissingPiazzaKeyException.class)
-	private ResponseEntity<String> missingPiazzaKeyHandler(HttpServletResponse response) {
+	private ResponseEntity<String> missingPiazzaKeyHandler() {
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.TEXT_PLAIN);
 
@@ -117,17 +115,25 @@ public class GeoPackageController {
 	}
 
 	/**
+	 * Handler for the call to Piazza for an object fails due to an arbitrary HTTP error
+	 * @param ex exception containing the failed response entity, which gets passed through
+	 * @return
+	 */
+	@ExceptionHandler(PiazzaApi.HttpRequestFailedException.class)
+	private ResponseEntity<byte[]> fetchingPiazzaObjectFailed(PiazzaApi.HttpRequestFailedException ex) {
+		return ex.getResponseEntity();
+	}
+	
+	/**
 	 * Handler for errors during the GeoJSON to GPKG conversion.
 	 * 
 	 * General handler for a server error during the conversion. As a side
 	 * effect, sets the response status code to 500 Server Error.
-	 * 
-	 * @param response
-	 *            {@link HttpServletResponse} response object
+
 	 * @return String error message to return to the client
 	 */
 	@ExceptionHandler(GeoPackageConverter.GeoPackageConversionError.class)
-	private ResponseEntity<String> conversionFailedHandler(Exception ex, HttpServletResponse response) {
+	private ResponseEntity<String> conversionFailedHandler(Exception ex) {
 		StringWriter traceWriter = new StringWriter();
 		ex.printStackTrace(new PrintWriter(traceWriter));
 		String trace = traceWriter.getBuffer().toString();

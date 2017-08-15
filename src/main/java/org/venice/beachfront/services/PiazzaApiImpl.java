@@ -11,6 +11,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
 /**
@@ -74,7 +76,12 @@ public class PiazzaApiImpl implements PiazzaApi {
 			HttpEntity<String> entity = new HttpEntity<>(headers);
 
 			RestTemplate restTemplate = this.restTemplateFactory.getRestTemplate();
-			ResponseEntity<byte[]> response = restTemplate.exchange(url, HttpMethod.GET, entity, byte[].class);
+			ResponseEntity<byte[]> response;
+			try {
+				response = restTemplate.exchange(url, HttpMethod.GET, entity, byte[].class);
+			} catch (HttpClientErrorException | HttpServerErrorException ex) {
+				response = new ResponseEntity<byte[]>(ex.getResponseBodyAsByteArray(), ex.getResponseHeaders(), ex.getStatusCode());
+			}
 
 			if (!response.getStatusCode().is2xxSuccessful()) {
 				throw new PiazzaApi.HttpRequestFailedException(response);
