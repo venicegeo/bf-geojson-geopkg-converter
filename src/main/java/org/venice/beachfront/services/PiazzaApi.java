@@ -3,8 +3,7 @@ package org.venice.beachfront.services;
 
 import java.util.concurrent.CompletableFuture;
 
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.RestTemplate;
+import com.github.kevinsawicki.http.HttpRequest;
 
 /**
  * Interface for a Piazza API service for interfacing with a Piazza API
@@ -35,16 +34,18 @@ public interface PiazzaApi {
     public String getUrlForItemId(String id);
 
     /**
-     * An interface for a factory class with the purpose of creating {@link RestTemplate}
-     * objects. This is necessary for properly mocking HTTP requests in testing.
+     * An interface for a factory for creating {@link HttpRequest} objects
+     * for a given URL. This is necessary for proper mocking/testing of the
+     * HTTP requests.
      */
-    public interface RestTemplateFactory {
+    public interface HttpRequestFactory {
         /**
-         * Create a plain Spring RestTemplate.
+         * Create an HTTP request for a given URL.
          * 
-         * @return A new plain RestTemplate
+         * @param url The URL to create a request for
+         * @return A new HTTP request for the given URL
          */
-        public RestTemplate getRestTemplate();
+        public HttpRequest getHttpRequest(String url);
     }
 
     /**
@@ -60,13 +61,4 @@ public interface PiazzaApi {
      * Simple subclass of {@link RuntimeException}
      */
     public class DataIdNotSpecifiedException extends RuntimeException {}
-    
-	public class HttpRequestFailedException extends RuntimeException {
-		private ResponseEntity<byte[]> responseEntity;
-    	public HttpRequestFailedException(ResponseEntity<byte[]> responseEntity) {
-    		this.responseEntity = responseEntity;
-    	}
-    	
-    	public ResponseEntity<byte[]> getResponseEntity() { return this.responseEntity; }
-    }
 }
