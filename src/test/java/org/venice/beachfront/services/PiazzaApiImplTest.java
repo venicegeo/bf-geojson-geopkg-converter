@@ -1,7 +1,6 @@
 package org.venice.beachfront.services;
 
 import org.venice.beachfront.services.PiazzaApi;
-import org.venice.beachfront.services.PiazzaApi.RestTemplateFactory;
 import org.venice.beachfront.services.PiazzaApiImpl;
 
 import junit.framework.TestCase;
@@ -37,7 +36,8 @@ public class PiazzaApiImplTest extends TestCase {
 				Mockito.eq(HttpMethod.GET), Mockito.any(HttpEntity.class), Mockito.eq(byte[].class)))
 				.then(new Answer<ResponseEntity<byte[]>>() {
 					public ResponseEntity<byte[]> answer(InvocationOnMock invocation) {
-						HttpEntity<String> requestEntity = invocation.getArgument(2);
+						@SuppressWarnings("unchecked")
+						HttpEntity<String> requestEntity = invocation.getArgumentAt(2, HttpEntity.class);
 						if (requestEntity.getHeaders().getFirst("Authorization").equals(mockAuthorization)) {
 							return new ResponseEntity<byte[]>(mockRequestBody.getBytes(), HttpStatus.OK);
 						}
@@ -46,7 +46,7 @@ public class PiazzaApiImplTest extends TestCase {
 					}
 				});
 
-		PiazzaApi.RestTemplateFactory factory = (RestTemplateFactory) Mockito.mock(PiazzaApi.RestTemplateFactory.class);
+		PiazzaApi.RestTemplateFactory factory = Mockito.mock(PiazzaApi.RestTemplateFactory.class);
 		Mockito.when(factory.getRestTemplate()).thenReturn(this.mockRestTemplate);
 
 		this.piazzaApi = new PiazzaApiImpl(this.mockPiazzaUrl, factory);

@@ -47,7 +47,8 @@ public class GeoPackageControllerTest extends TestCase {
         }
     }
 
-    public void testFailedConversionThrowsCorrectError() throws ExecutionException, InterruptedException {
+    @SuppressWarnings("unchecked")
+	public void testFailedConversionThrowsCorrectError() throws ExecutionException, InterruptedException {
         Mockito.when(
             this.mockGeoPackageConverter.apply(Mockito.any())
         ).thenThrow(GeoPackageConverter.GeoPackageConversionError.class);
