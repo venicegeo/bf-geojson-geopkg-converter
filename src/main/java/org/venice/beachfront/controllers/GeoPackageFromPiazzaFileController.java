@@ -28,7 +28,7 @@ import org.venice.beachfront.services.PiazzaApi;
  * @version 1.0
  */
 @Controller
-public class GeoPackageController {
+public class GeoPackageFromPiazzaFileController {
 	/**
 	 * Injected dependency on the Piazza API service.
 	 */
@@ -48,7 +48,7 @@ public class GeoPackageController {
 	 *            The GeoPackageConverter service instance to use
 	 */
 	@Autowired
-	public GeoPackageController(PiazzaApi piazzaApi, GeoPackageConverter geoPackageConverter) {
+	public GeoPackageFromPiazzaFileController(PiazzaApi piazzaApi, GeoPackageConverter geoPackageConverter) {
 		this.piazzaApi = piazzaApi;
 		this.geoPackageConverter = geoPackageConverter;
 	}

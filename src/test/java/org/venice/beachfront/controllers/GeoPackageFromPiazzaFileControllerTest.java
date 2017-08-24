@@ -14,8 +14,8 @@ import org.venice.beachfront.services.PiazzaApi;
 import junit.framework.TestCase;
 
 
-public class GeoPackageControllerTest extends TestCase {
-    GeoPackageController controller;
+public class GeoPackageFromPiazzaFileControllerTest extends TestCase {
+    GeoPackageFromPiazzaFileController controller;
     PiazzaApi mockPiazzaApi;
     GeoPackageConverter mockGeoPackageConverter;
     HttpServletResponse mockResponse;
@@ -39,7 +39,7 @@ public class GeoPackageControllerTest extends TestCase {
             .thenReturn(this.mockResultSqlite);
 
         this.mockResponse = Mockito.mock(HttpServletResponse.class);
-        this.controller = new GeoPackageController(this.mockPiazzaApi, this.mockGeoPackageConverter);
+        this.controller = new GeoPackageFromPiazzaFileController(this.mockPiazzaApi, this.mockGeoPackageConverter);
     }
 
     public void testControllerRequiresPiazzaKey() throws ExecutionException, InterruptedException {
@@ -48,7 +48,7 @@ public class GeoPackageControllerTest extends TestCase {
             TestCase.fail(String.format("Expected error for missing Piazza key, got %s", new String(result)));
         } catch (ExecutionException e) {
             TestCase.assertEquals(
-                GeoPackageController.MissingPiazzaKeyException.class, 
+                GeoPackageFromPiazzaFileController.MissingPiazzaKeyException.class, 
                 e.getCause().getClass());
         }
     }
