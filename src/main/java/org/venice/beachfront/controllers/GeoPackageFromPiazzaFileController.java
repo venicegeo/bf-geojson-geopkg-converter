@@ -95,6 +95,7 @@ public class GeoPackageFromPiazzaFileController {
 				.thenApply((data) -> {
 					String filename = String.format("%s.gpkg", id);
 					response.setHeader("Content-disposition", String.format("attachment; filename=%s", filename));
+					response.setHeader("Content-type", "application/x-sqlite3");
 					return data;
 				});
 	}
