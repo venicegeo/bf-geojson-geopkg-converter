@@ -1,16 +1,9 @@
 package org.venice.beachfront.controllers;
 
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-
-import javax.servlet.http.HttpServletResponse;
-
 import org.mockito.Mockito;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.venice.beachfront.services.GeoPackageConverter;
-import org.venice.beachfront.services.PiazzaApi;
 
 import junit.framework.TestCase;
 
