@@ -28,7 +28,7 @@ import org.venice.beachfront.services.PiazzaApi;
  * @version 1.0
  */
 @Controller
-public class GeoPackageController {
+public class GeoPackageFromPiazzaFileController {
 	/**
 	 * Injected dependency on the Piazza API service.
 	 */
@@ -48,7 +48,7 @@ public class GeoPackageController {
 	 *            The GeoPackageConverter service instance to use
 	 */
 	@Autowired
-	public GeoPackageController(PiazzaApi piazzaApi, GeoPackageConverter geoPackageConverter) {
+	public GeoPackageFromPiazzaFileController(PiazzaApi piazzaApi, GeoPackageConverter geoPackageConverter) {
 		this.piazzaApi = piazzaApi;
 		this.geoPackageConverter = geoPackageConverter;
 	}
@@ -95,6 +95,7 @@ public class GeoPackageController {
 				.thenApply((data) -> {
 					String filename = String.format("%s.gpkg", id);
 					response.setHeader("Content-disposition", String.format("attachment; filename=%s", filename));
+					response.setHeader("Content-type", "application/x-sqlite3");
 					return data;
 				});
 	}
