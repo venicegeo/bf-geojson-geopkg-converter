@@ -46,7 +46,7 @@
         <dependency>
             <groupId>mil.nga.geopackage</groupId>
             <artifactId>geopackage</artifactId>
-            <version>1-2-1-9-g1d3469c</version> <!-- must be kept up to date manually -->
+            <version>1.2.1-9-g1d3469c</version> <!-- must be kept up to date manually -->
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
