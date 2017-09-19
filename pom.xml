@@ -44,16 +44,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>mil.nga</groupId>
-            <artifactId>wkb</artifactId>
-            <version>1.0.2-47-g8aa7941</version> <!-- must be kept up to date manually -->
-        </dependency>
-        <dependency>
-            <groupId>mil.nga.geopackage</groupId>
-            <artifactId>geopackage-core</artifactId>
-            <version>1.2.1-9-gf5347d3</version> <!-- must be kept up to date manually -->
-        </dependency>
-        <dependency>
             <groupId>mil.nga.geopackage</groupId>
             <artifactId>geopackage</artifactId>
             <version>1.2.1-9-g1d3469c</version> <!-- must be kept up to date manually -->
