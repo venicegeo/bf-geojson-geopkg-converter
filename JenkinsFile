@@ -61,7 +61,7 @@ node {
             -DrepositoryId=nexus \
             -Durl="${env.ARTIFACT_STORAGE_DEPLOY_URL}" \
             -Dmaven.repo.local="${root}/.m2/repository" \
-            -DgeneratePom=false \
+            -DgeneratePom=true \
             -Dpackaging=jar \
             -DgroupId=${depGroupId} \
             -DartifactId=${depArtifactId} \
