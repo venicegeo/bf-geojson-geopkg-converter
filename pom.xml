@@ -57,14 +57,14 @@
     </dependencies>
     <repositories>
         <repository>
-            <id>spring-releases</id>
-            <url>https://repo.spring.io/libs-release</url>
+            <id>nexus</id>
+            <url>${env.ARTIFACT_STORAGE_URL}</url>
         </repository>
     </repositories>
     <pluginRepositories>
         <pluginRepository>
-            <id>spring-releases</id>
-            <url>https://repo.spring.io/libs-release</url>
+            <id>nexus</id>
+            <url>${env.ARTIFACT_STORAGE_URL}</url>
         </pluginRepository>
     </pluginRepositories>
     <build>
