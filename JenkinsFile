@@ -10,31 +10,61 @@ node {
     deleteDir()
     if(env.GITLAB_CREDS) {
       git url: "${env.GIT_URL}", branch: "${env.GIT_BRANCH}", credentialsId: "${env.GITLAB_CREDS}"
-      } else {
-        git url: "${env.GIT_URL}", branch: "${env.GIT_BRANCH}"
-      }
+    } else {
+      git url: "${env.GIT_URL}", branch: "${env.GIT_BRANCH}"
     }
+  }
 
   def appvers = sh(script: """git describe --long --tags --always | sed 's/\\./-/'g""", returnStdout: true)
   appvers = appvers.trim()
   def fullAppName = "${appName}-${appvers}"
 
-  stage("Archive") {
+  stage("Build/Push Dependencies") {
     sh """
-    # sed -i 's,\${env.ARTIFACT_STORAGE_URL},${env.ARTIFACT_STORAGE_URL},g' pom.xml
-    ${mvn}/bin/mvn clean package -U -Dmaven.repo.local=${root}
-    cp ${root}/target/geojsongpkgconverter-1.0.0.jar ${root}/${fullAppName}.jar
+      mkdir -p ${root}/deps
+
+      git clone https://github.com/venicegeo/geopackage-wkb-java.git
+      git clone https://github.com/venicegeo/geopackage-core-java.git
+      git clone https://github.com/venicegeo/geopackage-java.git
 
     """
 
+    def buildAndPushDep = { String dep ->
+      dir("${root}/deps/${dep}") {
+        echo "Building and pushing ${dep}"
+        sh """
+          mvn clean install -U -Dmaven.repo.local=${root}
+          cp target/*.jar ${dep}.jar
+          mvn -X --settings ~/.m2/settings.xml deploy:deploy-file -Dfile=${dep}.jar \
+            -DrepositoryId=nexus \
+            -Durl="${env.ARTIFACT_STORAGE_DEPLOY_URL}" \
+            -DgeneratePom=false \
+            -Dpackaging=jar \
+            -Dmaven.repo.local="${root}/.m2/repository" \
+        """
+      }
+    }
+
+    buildAndPushDep("geopackage-wkb-java")
+    buildAndPushDep("geopackage-core-java")
+    buildAndPushDep("geopackage-java")
+  }
+
+  stage("Archive") {
+    sh """
+      # sed -i 's,\${env.ARTIFACT_STORAGE_URL},${env.ARTIFACT_STORAGE_URL},g' pom.xml
+      ${mvn}/bin/mvn clean package -U -Dmaven.repo.local=${root}
+      cp ${root}/target/geojsongpkgconverter-1.0.0.jar ${root}/${fullAppName}.jar
+    """
+
     def getDependencyStatus = sh(script: """mvn -X --settings ~/.m2/settings.xml dependency:get \
-    -Dmaven.repo.local="${root}/.m2/repository" \
-    -DrepositoryId=nexus \
-    -DartifactId=${artifactId} \
-    -Dversion=${appvers} \
-    -DgroupId="org.venice.beachfront" \
-    -Dpackaging=jar \
-    -DremoteRepositories="nexus::default::${env.ARTIFACT_STORAGE_DEPLOY_URL}" \
+      -Dmaven.repo.local="${root}/.m2/repository" \
+      -DrepositoryId=nexus \
+      -DartifactId=${artifactId} \
+      -Dversion=${appvers} \
+      -DgroupId="org.venice.beachfront" \
+      -Dpackaging=jar \
+      -DremoteRepositories="nexus::default::${env.ARTIFACT_STORAGE_DEPLOY_URL}" \
     """, returnStatus: true)
     echo "dependency status = ${getDependencyStatus}"
 
