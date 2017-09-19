@@ -19,35 +19,60 @@ node {
   appvers = appvers.trim()
   def fullAppName = "${appName}-${appvers}"
 
+  // TODO: Dependencies should probably have their own pipeline rather than being built as part of this one
   stage("Build/Push Dependencies") {
-    sh """
-      mkdir -p ${root}/deps
+    sh "mkdir -p ${root}/deps"
 
-      git clone https://github.com/venicegeo/geopackage-wkb-java.git
-      git clone https://github.com/venicegeo/geopackage-core-java.git
-      git clone https://github.com/venicegeo/geopackage-java.git
+    dir("${root}/deps") {
+      sh """
+        git clone https://github.com/venicegeo/geopackage-wkb-java.git
+        git clone https://github.com/venicegeo/geopackage-core-java.git
+        git clone https://github.com/venicegeo/geopackage-java.git
+      """
+    }
 
-    """
-
-    def buildAndPushDep = { String dep ->
+    def buildAndPushDep = { String dep, String depGroupId, String depArtifactId ->
       dir("${root}/deps/${dep}") {
-        echo "Building and pushing ${dep}"
+        def version = sh(script: """git describe --long --tags --always | sed 's/\\./-/'g""", returnStdout: true)
+        version = version.trim()
+        echo "Building and pushing ${dep}@${version}"
+
+        def getDependencyStatus = sh(script: """mvn -X --settings ~/.m2/settings.xml dependency:get \
+          -DrepositoryId=nexus \
+          -DremoteRepositories="nexus::default::${env.ARTIFACT_STORAGE_DEPLOY_URL}" \
+          -Durl="${env.ARTIFACT_STORAGE_DEPLOY_URL}" \
+          -Dmaven.repo.local="${root}/.m2/repository" \
+          -Dpackaging=jar \
+          -DgroupId=${depGroupId} \
+          -DartifactId=${depArtifactId} \
+          -Dversion=${version} \
+        """, returnStatus: true)
+        echo "dependency status = ${getDependencyStatus}"
+
+        if(getDependencyStatus == 0) {
+          echo "Artifact version ${appvers} exists in Nexus, nothing to do"
+          return
+        }
+
         sh """
-          mvn clean install -U -Dmaven.repo.local=${root}
-          cp target/*.jar ${dep}.jar
-          mvn -X --settings ~/.m2/settings.xml deploy:deploy-file -Dfile=${dep}.jar \
+          ${mvn}/bin/mvn clean install -U -Dmaven.repo.local=${root}/.m2/repository
+          DEPENDENCY_JAR=\$(ls target/ | awk '!/(sources|javadoc).jar/ && /.jar\$/ {print \$1; exit}')
+          mvn -X --settings ~/.m2/settings.xml deploy:deploy-file -Dfile=target/\$DEPENDENCY_JAR \
             -DrepositoryId=nexus \
             -Durl="${env.ARTIFACT_STORAGE_DEPLOY_URL}" \
+            -Dmaven.repo.local="${root}/.m2/repository" \
             -DgeneratePom=false \
             -Dpackaging=jar \
-            -Dmaven.repo.local="${root}/.m2/repository" \
+            -DgroupId=${depGroupId} \
+            -DartifactId=${depArtifactId} \
+            -Dversion=${version} \
         """
       }
     }
 
-    buildAndPushDep("geopackage-wkb-java")
-    buildAndPushDep("geopackage-core-java")
-    buildAndPushDep("geopackage-java")
+    buildAndPushDep("geopackage-wkb-java", "mil.nga", "wkb")
+    buildAndPushDep("geopackage-core-java", "mil.nga.geopackage", "geopackage-core")
+    buildAndPushDep("geopackage-java", "mil.nga.geopackage", "geopackage")
   }
 
   stage("Archive") {
@@ -94,7 +119,11 @@ node {
         cf api ${env.PCF_API_ENDPOINT}
         cf auth ${CFUSER} ${CFPASS}
         cf target -o ${env.PCF_ORG} -s ${pcfSpace}
-        cf push ${fullAppName} -f manifest.jenkins.yml --hostname ${fullAppName} -d ${pcfDomain} --no-start
+        cf push ${fullAppName} -f manifest.jenkins.yml \
+          -p ${root}/${fullAppName}.jar \
+          -d ${pcfDomain} \
+          --hostname ${fullAppName} \
+          --no-start
         cf set-env ${fullAppName} PIAZZA_URL ${env.PIAZZA_URL}
         """
 
