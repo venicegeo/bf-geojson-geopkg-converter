@@ -213,11 +213,11 @@ node {
     stage("Phase Two Deploy") {
       deployPhase(env.PHASE_TWO_PCF_SPACE, env.PHASE_TWO_PCF_DOMAIN)
     }
-  }
 
-  if(!params.SKIP_INTEGRATION_TESTS) {
-    stage("Phase Two Integration Tests") {
-      integrationTestPhase(env.PHASE_TWO_PCF_SPACE, env.PHASE_TWO_PCF_DOMAIN)
+    if(!params.SKIP_INTEGRATION_TESTS) {
+      stage("Phase Two Integration Tests") {
+        integrationTestPhase(env.PHASE_TWO_PCF_SPACE, env.PHASE_TWO_PCF_DOMAIN)
+      }
     }
   }
 }
