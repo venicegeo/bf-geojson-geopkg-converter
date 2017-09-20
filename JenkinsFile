@@ -33,9 +33,9 @@ node {
 
     def buildAndPushDep = { String dep, String depGroupId, String depArtifactId ->
       dir("${root}/deps/${dep}") {
-        //def version = sh(script: """git describe --long --tags --always | sed 's/\\./-/'g""", returnStdout: true)
+        // Use the real version from pom.xml
         def version = sh(script: """xmllint --xpath "//*[local-name()='project']/*[local-name()='version']/text()" pom.xml""", returnStdout: true)
-        version = version.trim() // + "-built-by-${appvers}"
+        version = version.trim()
         echo "Building and pushing ${dep}@${version}"
 
         def getDependencyStatus = sh(script: """mvn -X --settings ~/.m2/settings.xml dependency:get \
