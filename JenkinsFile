@@ -60,7 +60,7 @@ node {
           cf target -o ${env.PCF_ORG} -s ${pcfSpace}
         """
         def legacyAppNames = sh(script: """cf routes | grep \"${appName} \" | awk '{print \$4}'""", returnStdout: true)
-        sh "cf map-route ${fullAppName} ${pcfDomain} --hostname bf-ia-broker"
+        sh "cf map-route ${fullAppName} ${pcfDomain} --hostname bf-geojson-geopkg-converter"
         // Remove legacy applications
         for (Object legacyApp : legacyAppNames.trim().tokenize(',')) {
           def legacyAppName = legacyApp.toString().trim()
