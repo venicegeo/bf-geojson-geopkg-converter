@@ -132,7 +132,7 @@ node {
 
     def buildAndPushDep = { String dep, String depGroupId, String depArtifactId ->
       dir("${root}/deps/${dep}") {
-        pwd()
+        echo(pwd())
         // Use the real version from pom.xml
         def version = sh(script: """xmllint --xpath "//*[local-name()='project']/*[local-name()='version']/text()" pom.xml""", returnStdout: true)
         version = version.trim()
