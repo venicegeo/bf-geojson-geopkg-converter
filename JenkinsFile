@@ -108,6 +108,10 @@ node {
     }
   }
 
+  def appvers = sh(script: """git describe --long --tags --always | sed 's/\\./-/'g""", returnStdout: true)
+  appvers = appvers.trim()
+  def fullAppName = "${appName}-${appvers}"
+
   // TODO: Dependencies should probably have their own pipeline rather than being built as part of this one
   stage("Build/Push Dependencies") {
     sh """
