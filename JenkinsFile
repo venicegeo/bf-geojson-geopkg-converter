@@ -110,19 +110,28 @@ node {
 
   // TODO: Dependencies should probably have their own pipeline rather than being built as part of this one
   stage("Build/Push Dependencies") {
-    sh "mkdir -p ${root}/deps"
+    sh """
+      mkdir -p ${root}/deps
+      mkdir -p ${root}/deps/geopackage-wkb-java
+      mkdir -p ${root}/deps/geopackage-core-java
+      mkdir -p ${root}/deps/geopackage-java
+    """
 
-    dir("${root}/deps") {
+    dir("${root}/deps/geopackage-wkb-java") {
       if(env.GITLAB_CREDS) {
         git url: "${env.GIT_BASE_URL}geopackage-wkb-java.git", branch: "${env.GIT_BRANCH}", credentialsId: "${env.GITLAB_CREDS}"
       } else {
         git url: "${env.GIT_BASE_URL}geopackage-wkb-java.git", branch: "${env.GIT_BRANCH}"
       }
+    }
+    dir("${root}/deps/geopackage-core-java") {
       if(env.GITLAB_CREDS) {
         git url: "${env.GIT_BASE_URL}geopackage-core-java.git", branch: "${env.GIT_BRANCH}", credentialsId: "${env.GITLAB_CREDS}"
       } else {
         git url: "${env.GIT_BASE_URL}geopackage-core-java.git", branch: "${env.GIT_BRANCH}"
       }
+    }
+    dir("${root}/deps/geopackage-java") {
       if(env.GITLAB_CREDS) {
         git url: "${env.GIT_BASE_URL}geopackage-java.git", branch: "${env.GIT_BRANCH}", credentialsId: "${env.GITLAB_CREDS}"
       } else {
@@ -132,8 +141,6 @@ node {
 
     def buildAndPushDep = { String dep, String depGroupId, String depArtifactId ->
       dir("${root}/deps/${dep}") {
-        sh """ls -al"""
-        sh """ls ${root}/deps -al"""
         // Use the real version from pom.xml
         def version = sh(script: """xmllint --xpath "//*[local-name()='project']/*[local-name()='version']/text()" pom.xml""", returnStdout: true)
         version = version.trim()
