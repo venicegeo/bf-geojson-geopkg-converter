@@ -113,11 +113,21 @@ node {
     sh "mkdir -p ${root}/deps"
 
     dir("${root}/deps") {
-      sh """
-        git clone https://github.com/venicegeo/geopackage-wkb-java.git
-        git clone https://github.com/venicegeo/geopackage-core-java.git
-        git clone https://github.com/venicegeo/geopackage-java.git
-      """
+      if(env.GITLAB_CREDS) {
+        git url: "${env.GIT_BASE_URL}geopackage-wkb-java.git", branch: "${env.GIT_BRANCH}", credentialsId: "${env.GITLAB_CREDS}"
+      } else {
+        git url: "${env.GIT_BASE_URL}geopackage-wkb-java.git", branch: "${env.GIT_BRANCH}"
+      }
+      if(env.GITLAB_CREDS) {
+        git url: "${env.GIT_BASE_URL}geopackage-core-java.git", branch: "${env.GIT_BRANCH}", credentialsId: "${env.GITLAB_CREDS}"
+      } else {
+        git url: "${env.GIT_BASE_URL}geopackage-core-java.git", branch: "${env.GIT_BRANCH}"
+      }
+      if(env.GITLAB_CREDS) {
+        git url: "${env.GIT_BASE_URL}geopackage-java.git", branch: "${env.GIT_BRANCH}", credentialsId: "${env.GITLAB_CREDS}"
+      } else {
+        git url: "${env.GIT_BASE_URL}geopackage-java.git", branch: "${env.GIT_BRANCH}"
+      }
     }
 
     def buildAndPushDep = { String dep, String depGroupId, String depArtifactId ->
