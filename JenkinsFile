@@ -10,7 +10,7 @@ node {
 
   // Deploy and integration test function abstractions
 
-  def deployPhase = { String pcfSpace, String pcfDomain ->
+  def deployPhase = { String pcfSpace, String pcfDomain, String fullAppName ->
     if(!fileExists('.cf')) {
       sh "mkdir -p .cf"
     }
@@ -239,7 +239,7 @@ node {
   }
 
   stage("Phase One Deploy") {
-    deployPhase(env.PHASE_ONE_PCF_SPACE, env.PHASE_ONE_PCF_DOMAIN)
+    deployPhase(env.PHASE_ONE_PCF_SPACE, env.PHASE_ONE_PCF_DOMAIN, fullAppName)
   }
 
   if(!params.SKIP_INTEGRATION_TESTS) {
