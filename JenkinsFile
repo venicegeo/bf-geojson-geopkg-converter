@@ -23,6 +23,7 @@ node {
         cf push ${fullAppName} -f manifest.jenkins.yml \
           -p ${root}/${fullAppName}.jar \
           -d ${pcfDomain} \
+		  -b ${env.JAVA_BUILDPACK_NAME} \
           --hostname ${fullAppName} \
           --no-start
         cf set-env ${fullAppName} PIAZZA_URL ${env.PIAZZA_URL}
