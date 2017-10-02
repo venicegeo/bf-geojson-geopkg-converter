@@ -7,9 +7,6 @@ node {
   def mvn = tool 'M3'
   def zapHome = tool 'ZAProxy_v2_5_0'
   def nodejs = tool 'NodeJS_6'
-  def appvers = sh(script: """git describe --long --tags --always | sed 's/\\./-/'g""", returnStdout: true)
-  appvers = appvers.trim()
-  def fullAppName = "${appName}-${appvers}"
 
   // Deploy and integration test function abstractions
 
@@ -107,6 +104,10 @@ node {
       git url: "${env.GIT_URL}", branch: "${env.GIT_BRANCH}"
     }
   }
+  
+  def appvers = sh(script: """git describe --long --tags --always | sed 's/\\./-/'g""", returnStdout: true)
+  appvers = appvers.trim()
+  def fullAppName = "${appName}-${appvers}"
 
   // TODO: Dependencies should probably have their own pipeline rather than being built as part of this one
   stage("Build/Push Dependencies") {
