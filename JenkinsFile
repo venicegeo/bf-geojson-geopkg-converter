@@ -7,13 +7,10 @@ node {
   def mvn = tool 'M3'
   def zapHome = tool 'ZAProxy_v2_5_0'
   def nodejs = tool 'NodeJS_6'
-  def appvers = sh(script: """git describe --long --tags --always | sed 's/\\./-/'g""", returnStdout: true)
-  appvers = appvers.trim()
-  def fullAppName = "${appName}-${appvers}"
 
   // Deploy and integration test function abstractions
 
-  def deployPhase = { String pcfSpace, String pcfDomain ->
+  def deployPhase = { String pcfSpace, String pcfDomain, String fullAppName ->
     if(!fileExists('.cf')) {
       sh "mkdir -p .cf"
     }
@@ -26,6 +23,7 @@ node {
         cf push ${fullAppName} -f manifest.jenkins.yml \
           -p ${root}/${fullAppName}.jar \
           -d ${pcfDomain} \
+		  -b ${env.JAVA_BUILDPACK_NAME} \
           --hostname ${fullAppName} \
           --no-start
         cf set-env ${fullAppName} PIAZZA_URL ${env.PIAZZA_URL}
@@ -60,7 +58,7 @@ node {
           cf target -o ${env.PCF_ORG} -s ${pcfSpace}
         """
         def legacyAppNames = sh(script: """cf routes | grep \"${appName} \" | awk '{print \$4}'""", returnStdout: true)
-        sh "cf map-route ${fullAppName} ${pcfDomain} --hostname bf-ia-broker"
+        sh "cf map-route ${fullAppName} ${pcfDomain} --hostname bf-geojson-geopkg-converter"
         // Remove legacy applications
         for (Object legacyApp : legacyAppNames.trim().tokenize(',')) {
           def legacyAppName = legacyApp.toString().trim()
@@ -107,17 +105,40 @@ node {
       git url: "${env.GIT_URL}", branch: "${env.GIT_BRANCH}"
     }
   }
+  
+  def appvers = sh(script: """git describe --long --tags --always | sed 's/\\./-/'g""", returnStdout: true)
+  appvers = appvers.trim()
+  def fullAppName = "${appName}-${appvers}"
 
   // TODO: Dependencies should probably have their own pipeline rather than being built as part of this one
   stage("Build/Push Dependencies") {
-    sh "mkdir -p ${root}/deps"
+    sh """
+      mkdir -p ${root}/deps
+      mkdir -p ${root}/deps/geopackage-wkb-java
+      mkdir -p ${root}/deps/geopackage-core-java
+      mkdir -p ${root}/deps/geopackage-java
+    """
 
-    dir("${root}/deps") {
-      sh """
-        git clone https://github.com/venicegeo/geopackage-wkb-java.git
-        git clone https://github.com/venicegeo/geopackage-core-java.git
-        git clone https://github.com/venicegeo/geopackage-java.git
-      """
+    dir("${root}/deps/geopackage-wkb-java") {
+      if(env.GITLAB_CREDS) {
+        git url: "${env.GIT_BASE_URL}geopackage-wkb-java.git", branch: "${env.GIT_BRANCH}", credentialsId: "${env.GITLAB_CREDS}"
+      } else {
+        git url: "${env.GIT_BASE_URL}geopackage-wkb-java.git", branch: "${env.GIT_BRANCH}"
+      }
+    }
+    dir("${root}/deps/geopackage-core-java") {
+      if(env.GITLAB_CREDS) {
+        git url: "${env.GIT_BASE_URL}geopackage-core-java.git", branch: "${env.GIT_BRANCH}", credentialsId: "${env.GITLAB_CREDS}"
+      } else {
+        git url: "${env.GIT_BASE_URL}geopackage-core-java.git", branch: "${env.GIT_BRANCH}"
+      }
+    }
+    dir("${root}/deps/geopackage-java") {
+      if(env.GITLAB_CREDS) {
+        git url: "${env.GIT_BASE_URL}geopackage-java.git", branch: "${env.GIT_BRANCH}", credentialsId: "${env.GITLAB_CREDS}"
+      } else {
+        git url: "${env.GIT_BASE_URL}geopackage-java.git", branch: "${env.GIT_BRANCH}"
+      }
     }
 
     def buildAndPushDep = { String dep, String depGroupId, String depArtifactId ->
@@ -126,6 +147,24 @@ node {
         def version = sh(script: """xmllint --xpath "//*[local-name()='project']/*[local-name()='version']/text()" pom.xml""", returnStdout: true)
         version = version.trim()
         echo "Building and pushing ${dep}@${version}"
+
+        if(!params.SKIP_SCANS) {
+          stage("${dep} Scan") {
+            withCredentials([[$class: "StringBinding", credentialsId: "${env.THREADFIX_API_KEY}", variable: "THREADFIX_KEY"]]) {
+              // Dependency Checker
+              sh "/jslave/dependency-check/dependency-check/bin/dependency-check.sh --version"
+              sh '/jslave/dependency-check/dependency-check/bin/dependency-check.sh --project "GeoPackage ${dep}" --scan "." --format "XML" --enableExperimental --disableBundleAudit'
+              sh "/bin/curl -v --insecure -H 'Accept: application/json' -X POST --form file=@dependency-check-report.xml ${env.THREADFIX_URL}/rest/applications/${env.THREADFIX_ID}/upload?apiKey=${THREADFIX_KEY}"
+
+              // Fortify
+              sh "/opt/hp_fortify_sca/bin/sourceanalyzer -b ${env.BUILD_NUMBER} src/main/java/{*.java,**/*.java}"
+              sh "/opt/hp_fortify_sca/bin/sourceanalyzer -b ${env.BUILD_NUMBER}  -scan -Xmx1G -f fortifyResults-${env.BUILD_NUMBER}.fpr"
+              sh "/bin/curl -v --insecure -H 'Accept: application/json' -X POST --form file=@fortifyResults-${env.BUILD_NUMBER}.fpr ${env.THREADFIX_URL}/rest/applications/${env.THREADFIX_ID}/upload?apiKey=${THREADFIX_KEY}"
+
+              // TODO: Sonar targets must be added to Maven POM in order to enable Sonar scans.
+            }
+          }
+        }
 
         def getDependencyStatus = sh(script: """mvn -X --settings ~/.m2/settings.xml dependency:get \
           -DrepositoryId=nexus \
@@ -157,6 +196,7 @@ node {
             -DartifactId=${depArtifactId} \
             -Dversion=${version} \
         """
+
       }
     }
 
@@ -200,7 +240,7 @@ node {
   }
 
   stage("Phase One Deploy") {
-    deployPhase(env.PHASE_ONE_PCF_SPACE, env.PHASE_ONE_PCF_DOMAIN)
+    deployPhase(env.PHASE_ONE_PCF_SPACE, env.PHASE_ONE_PCF_DOMAIN, fullAppName)
   }
 
   if(!params.SKIP_INTEGRATION_TESTS) {
