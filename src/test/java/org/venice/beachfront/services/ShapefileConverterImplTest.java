@@ -16,10 +16,10 @@ public class ShapefileConverterImplTest extends TestCase {
     }
 
     public void testData() throws URISyntaxException, IOException {
-//    	processFile("LC80020522017095LGN00.geojson");
 //    	processFile("taz10.geojson");
 //    	processFile("fc-points.geojson");
     	processFile("shorelines-fc.geojson");
+    	processFile("LC80020522017095LGN00.geojson");
     }
     private void processFile(String inFileName) throws URISyntaxException, IOException{
 		java.net.URL url = ClassLoader.getSystemResource(inFileName);

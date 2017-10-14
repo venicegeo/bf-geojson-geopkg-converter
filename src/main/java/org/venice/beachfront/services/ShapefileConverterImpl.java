@@ -6,7 +6,6 @@ import java.io.Serializable;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,8 +29,6 @@ import org.geotools.feature.type.GeometryDescriptorImpl;
 import org.geotools.feature.type.GeometryTypeImpl;
 import org.geotools.geojson.feature.FeatureJSON;
 import org.geotools.geojson.geom.GeometryJSON;
-import org.geotools.geometry.DirectPosition2D;
-import org.geotools.geometry.GeometryBuilder;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.feature.Feature;
 import org.opengis.feature.Property;
@@ -45,14 +42,10 @@ import org.opengis.feature.type.GeometryType;
 import org.opengis.feature.type.Name;
 import org.opengis.feature.type.PropertyDescriptor;
 import org.opengis.feature.type.PropertyType;
-//import org.opengis.geometry.Geometry;
-import org.opengis.geometry.coordinate.GeometryFactory;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geomgraph.Position;
 
 /**
  * Implementation of the {@link GeoPackageConverter} interface.
@@ -80,14 +73,6 @@ public class ShapefileConverterImpl implements ShapefileConverter {
 		return result;
 	}
 	
-//	private static Map<String, Class<?>> TYPES = createTypes();
-//	private static Map<String, Class<?>> createTypes(){
-//		HashMap<String, Class<?>> result = new HashMap<String, Class<?>>();
-//		result.put("Double", java.lang.Double.class);
-//		result.put("String", java.lang.String.class);
-//		result.put("Integer", java.lang.Integer.class);
-//		return result;
-//	}
     /**
      * Perform the actual conversion from GeoJSON to Shapefile.
      *
