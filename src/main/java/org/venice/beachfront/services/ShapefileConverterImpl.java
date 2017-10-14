@@ -1,6 +1,9 @@
 package org.venice.beachfront.services;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.Reader;
 import java.io.Serializable;
 import java.io.StringReader;
@@ -9,6 +12,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import org.geotools.data.DataStore;
 import org.geotools.data.DefaultTransaction;
@@ -172,14 +177,79 @@ public class ShapefileConverterImpl implements ShapefileConverter {
             }
             
             // todo: ZIP
+            File zipFile = zipResults(shapefile);
 
             // Return the results
-            result = java.nio.file.Files.readAllBytes(shapefile.toPath());
+            result = java.nio.file.Files.readAllBytes(zipFile.toPath());
         } catch (Exception e) {
             throw new GeoPackageConverter.GeoPackageConversionError(e);
         }
         return result;
     }
+
+    private File zipResults(File input) throws IOException {
+    	File result = File.createTempFile("shorelines", ".zip");
+
+        byte[] buffer = new byte[1024];
+//        String source = new File(SOURCE_FOLDER).getName();
+        FileOutputStream fos = null;
+        ZipOutputStream zos = null;
+        try {
+            fos = new FileOutputStream(result);
+            zos = new ZipOutputStream(fos);
+
+            FileInputStream in = null;
+            
+            for (File file: getFiles(input)) {
+                System.out.println("File Added : " + file);
+                ZipEntry ze = new ZipEntry(file.getName());
+                zos.putNextEntry(ze);
+                try {
+                    in = new FileInputStream(file.getAbsolutePath());
+                    int len;
+                    while ((len = in .read(buffer)) > 0) {
+                        zos.write(buffer, 0, len);
+                    }
+                } finally {
+                    in.close();
+                }
+            }
+
+            zos.closeEntry();
+            System.out.println("Folder successfully compressed");
+
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        } finally {
+            try {
+                zos.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        
+    	return result;
+    }
+    
+    private File[] getFiles(File rootFile){
+    	File[] result = new File[0];
+    	ArrayList<File> files = new ArrayList<File>();
+    	String fileName = rootFile.getName();
+    	fileName = fileName.substring(0, fileName.lastIndexOf('.'));
+    	FilenameFilter ff = new FilenameFilter(fileName);
+        File parentFile = rootFile.getParentFile();
+        for (String filename: parentFile.list()) {
+        	if (ff.accept(rootFile, filename)) {
+        		files.add(new File(parentFile, filename));
+        	}
+        }
+        
+        return files.toArray(result);
+    }
+    
+//    private void cleanup(){
+//    	
+//    }
     
     private DefaultFeatureCollection fcToSFC(FeatureCollection<?, ?> input, SimpleFeatureType featureType){
     	DefaultFeatureCollection result = new DefaultFeatureCollection();
@@ -217,5 +287,16 @@ public class ShapefileConverterImpl implements ShapefileConverter {
     		result.add(sf);
     	}
     	return result;
+    }
+    private class FilenameFilter implements java.io.FilenameFilter {
+    	FilenameFilter(String root){
+    		this.root = root;
+    	}
+    	private String root;
+
+		@Override
+		public boolean accept(File dir, String name) {
+			return name.startsWith(root);
+		}
     }
 }
