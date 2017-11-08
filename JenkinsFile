@@ -87,7 +87,7 @@ node {
           } else {
             git url: "${env.INTEGRATION_GIT_URL}", branch: "${env.INTEGRATION_GIT_BRANCH}"
           }
-          sh "npm install newman@2"
+          sh "npm install newman@3"
           sh "/bin/bash ci/beachfront.sh"
         }
       }
@@ -105,7 +105,7 @@ node {
       git url: "${env.GIT_URL}", branch: "${env.GIT_BRANCH}"
     }
   }
-  
+
   def appvers = sh(script: """git describe --long --tags --always | sed 's/\\./-/'g""", returnStdout: true)
   appvers = appvers.trim()
   def fullAppName = "${appName}-${appvers}"
@@ -176,10 +176,10 @@ node {
           -DartifactId=${depArtifactId} \
           -Dversion=${version} \
         """, returnStatus: true)
-        echo "dependency status = ${getDependencyStatus}"
+        echo "dependency status of ${depGroupId}.${depArtifactId} = ${getDependencyStatus}"
 
         if(getDependencyStatus == 0) {
-          echo "Artifact version ${appvers} exists in Nexus, nothing to do"
+          echo "Artifact ${depGroupId}.${depArtifactId} version ${version} exists in Nexus, nothing to do"
           return
         }
 
@@ -221,10 +221,10 @@ node {
       -Dpackaging=jar \
       -DremoteRepositories="nexus::default::${env.ARTIFACT_STORAGE_DEPLOY_URL}" \
     """, returnStatus: true)
-    echo "dependency status = ${getDependencyStatus}"
+    echo "dependency status of org.venice.beachfront.${artifactId} = ${getDependencyStatus}"
 
     if(getDependencyStatus == 0) {
-      echo "Artifact version ${appvers} exists in Nexus, nothing to do"
+      echo "Artifact org.venice.beachfront.${artifactId} version ${appvers} exists in Nexus, nothing to do"
     } else {
       sh """mvn -X --settings ~/.m2/settings.xml deploy:deploy-file -Dfile=${root}/${fullAppName}.jar \
       -DrepositoryId=nexus \
