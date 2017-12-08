@@ -14,58 +14,58 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.venice.beachfront.services.GeoPackageConverter;
+import org.venice.beachfront.services.ShapefileConverter;
 
 @Controller
-public class GeoPackageFromJSONController {
+public class ShapefileFromJSONController {
 	/**
-	 * Injected dependency on the GeoPackage converter service.
+	 * Injected dependency on the Shapefile converter service.
 	 */
-	private GeoPackageConverter geoPackageConverter;
+	private ShapefileConverter shapefileConverter;
 	
 	/**
-	 * Construct the GeoPackageFromJSONFileController.
+	 * Construct the ShapefileFromJSONFileController.
 	 * 
-	 * @param geoPackageConverter
-	 *            The GeoPackageConverter service instance to use
+	 * @param shapefileConverter
+	 *            The ShapefileConverter service instance to use
 	 */
 	@Autowired
-	public GeoPackageFromJSONController(GeoPackageConverter geoPackageConverter) {
-		this.geoPackageConverter = geoPackageConverter;
+	public ShapefileFromJSONController(ShapefileConverter shapefileConverter) {
+		this.shapefileConverter = shapefileConverter;
 	}
 
 	/**
 	 * Core handler for converting from a Piazza ID to a GeoJSON file.
 	 * 
 	 * This controller provides a simple interface for immediate conversion of 
-	 * GeoJSON data to a GeoPackage file.
+	 * GeoJSON data to a Shapefile (.zip containing .shp, etc.).
 	 * 
-	 * {@link RequestMapping} decorated using the path {@code /convert},
-	 * request method POST, and as producing "application/x-sqlite3". 
+	 * {@link RequestMapping} decorated using the path {@code /convertshp},
+	 * request method POST, and as producing "application/zip". 
 	 * 
 	 * @param geojson a byte array containing the raw GeoJSON received via POST
 	 * request body
 	 * 
-	 * @return A {@link ResponseEntity} that contains the converted GeoPackage data
+	 * @return A {@link ResponseEntity} that contains the converted Shapefile data
 	 */
-	@RequestMapping(path = "/convert", method = RequestMethod.POST, consumes = {"application/json"}, produces = {"application/x-sqlite3"} )
+	@RequestMapping(path = "/convertshp", method = RequestMethod.POST, consumes = {"application/json"}, produces = {"application/zip"} )
 	@ResponseBody
-	public ResponseEntity<byte[]> convertToGeoPackage(@RequestBody byte[] geojson) {
-		byte[] gpkg = this.geoPackageConverter.apply(geojson);
+	public ResponseEntity<byte[]> convertToShapefile(@RequestBody byte[] geojson) {
+		byte[] gpkg = this.shapefileConverter.apply(geojson);
 		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(new MediaType("application", "x-sqlite3"));
+		headers.setContentType(new MediaType("application", "zip"));
 		return new ResponseEntity<byte[]>(gpkg, headers, HttpStatus.OK);
 	}
 
 	/**
-	 * Handler for errors during the GeoJSON to GPKG conversion.
+	 * Handler for errors during the GeoJSON to Shapefile conversion.
 	 * 
 	 * General handler for a server error during the conversion. As a side
 	 * effect, sets the response status code to 500 Server Error.
 
 	 * @return String error message to return to the client
 	 */
-	@ExceptionHandler(GeoPackageConverter.GeoPackageConversionError.class)
+	@ExceptionHandler(ShapefileConverter.ShapefileConversionError.class)
 	private ResponseEntity<String> conversionFailedHandler(Exception ex) {
 		StringWriter traceWriter = new StringWriter();
 		ex.printStackTrace(new PrintWriter(traceWriter));
