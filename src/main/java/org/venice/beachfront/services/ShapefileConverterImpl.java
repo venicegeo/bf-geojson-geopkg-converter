@@ -10,8 +10,10 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -176,11 +178,13 @@ public class ShapefileConverterImpl implements ShapefileConverter {
                 transaction.close();
             }
             
-            // todo: ZIP
             File zipFile = zipResults(shapefile);
 
             // Return the results
             result = java.nio.file.Files.readAllBytes(zipFile.toPath());
+            
+            cleanup(shapefile);
+            cleanup(zipFile);
         } catch (Exception e) {
             throw new GeoPackageConverter.GeoPackageConversionError(e);
         }
@@ -191,7 +195,6 @@ public class ShapefileConverterImpl implements ShapefileConverter {
     	File result = File.createTempFile("shorelines", ".zip");
 
         byte[] buffer = new byte[1024];
-//        String source = new File(SOURCE_FOLDER).getName();
         FileOutputStream fos = null;
         ZipOutputStream zos = null;
         try {
@@ -235,7 +238,6 @@ public class ShapefileConverterImpl implements ShapefileConverter {
     	File[] result = new File[0];
     	ArrayList<File> files = new ArrayList<File>();
     	String fileName = rootFile.getName();
-    	fileName = fileName.substring(0, fileName.lastIndexOf('.'));
     	FilenameFilter ff = new FilenameFilter(fileName);
         File parentFile = rootFile.getParentFile();
         for (String filename: parentFile.list()) {
@@ -247,9 +249,25 @@ public class ShapefileConverterImpl implements ShapefileConverter {
         return files.toArray(result);
     }
     
-//    private void cleanup(){
-//    	
-//    }
+    /**
+     * Remove the temporary files that were created
+     * @param shapefile
+     * @return the list of files that weren't deleted 
+     * (possibly useful for error reporting)
+     */
+    private Set<File> cleanup(File shapefile){
+    	
+    	final Set<File> result = new HashSet<File>();
+    	final File folder = new File(shapefile.getParent());
+		final File[] files = folder.listFiles(new FilenameFilter(shapefile.getName()));
+		for ( final File file : files ) {
+		    if ( !file.delete() ) {
+		        System.err.println( "Can't remove " + file.getAbsolutePath() );
+		    	result.add(file);
+		    }
+		}    
+		return result;
+	}
     
     private DefaultFeatureCollection fcToSFC(FeatureCollection<?, ?> input, SimpleFeatureType featureType){
     	DefaultFeatureCollection result = new DefaultFeatureCollection();
@@ -289,8 +307,8 @@ public class ShapefileConverterImpl implements ShapefileConverter {
     	return result;
     }
     private class FilenameFilter implements java.io.FilenameFilter {
-    	FilenameFilter(String root){
-    		this.root = root;
+    	FilenameFilter(String fileName){
+    		this.root = fileName.substring(0, fileName.lastIndexOf('.'));
     	}
     	private String root;
 
