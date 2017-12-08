@@ -95,7 +95,7 @@ public class ShapefileFromPiazzaFileController {
 				.thenApply((data) -> {
 					String filename = String.format("%s.gpkg", id);
 					response.setHeader("Content-disposition", String.format("attachment; filename=%s", filename));
-					response.setHeader("Content-type", "application/x-sqlite3");
+					response.setHeader("Content-type", "application/zip");
 					return data;
 				});
 	}
@@ -138,7 +138,7 @@ public class ShapefileFromPiazzaFileController {
 		StringWriter traceWriter = new StringWriter();
 		ex.printStackTrace(new PrintWriter(traceWriter));
 		String trace = traceWriter.getBuffer().toString();
-		String responseText = String.format("Failed to convert to GPKG:\n\n%s\n", trace);
+		String responseText = String.format("Failed to convert to Shapefile:\n\n%s\n", trace);
 
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.TEXT_PLAIN);

@@ -26,8 +26,6 @@ public class ShapefileFromJSONController {
 	/**
 	 * Construct the ShapefileFromJSONFileController.
 	 * 
-	 * @param piazzaApi
-	 *            The Piazza API service instance to use
 	 * @param shapefileConverter
 	 *            The ShapefileConverter service instance to use
 	 */
@@ -55,7 +53,7 @@ public class ShapefileFromJSONController {
 	public ResponseEntity<byte[]> convertToShapefile(@RequestBody byte[] geojson) {
 		byte[] gpkg = this.shapefileConverter.apply(geojson);
 		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(new MediaType("application", "application/zip"));
+		headers.setContentType(new MediaType("application", "zip"));
 		return new ResponseEntity<byte[]>(gpkg, headers, HttpStatus.OK);
 	}
 

@@ -26,8 +26,6 @@ public class GeoPackageFromJSONController {
 	/**
 	 * Construct the GeoPackageFromJSONFileController.
 	 * 
-	 * @param piazzaApi
-	 *            The Piazza API service instance to use
 	 * @param geoPackageConverter
 	 *            The GeoPackageConverter service instance to use
 	 */
