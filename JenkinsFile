@@ -206,10 +206,17 @@ node {
   }
 
   stage("Archive") {
+    // Build Tarball
+    def targetFiles = "${root}/${fullAppName}.jar manifest.jenkins.yml"
+    def artifactDirectory = "maven-artifact"
+    sh "mkdir -p ${root}/${artifactDirectory}"
+    def tarball = "bf-geojson-geopkg-converter.tar.gz"
     sh """
       sed -i 's,\${env.ARTIFACT_STORAGE_URL},${env.ARTIFACT_STORAGE_URL},g' pom.xml
       ${mvn}/bin/mvn clean package -U -Dmaven.repo.local=${root}
       cp ${root}/target/geojsongpkgconverter-1.0.0.jar ${root}/${fullAppName}.jar
+      tar cvvzf ${tarball} ${targetFiles}
+      mv ${tarball} ${root}/${artifactDirectory}/${tarball}
     """
 
     def getDependencyStatus = sh(script: """mvn -X --settings ~/.m2/settings.xml dependency:get \
@@ -218,7 +225,7 @@ node {
       -DartifactId=${artifactId} \
       -Dversion=${appvers} \
       -DgroupId="org.venice.beachfront" \
-      -Dpackaging=jar \
+      -Dpackaging=tar.gz \
       -DremoteRepositories="nexus::default::${env.ARTIFACT_STORAGE_DEPLOY_URL}" \
     """, returnStatus: true)
     echo "dependency status = ${getDependencyStatus}"
@@ -226,12 +233,12 @@ node {
     if(getDependencyStatus == 0) {
       echo "Artifact version ${appvers} exists in Nexus, nothing to do"
     } else {
-      sh """mvn -X --settings ~/.m2/settings.xml deploy:deploy-file -Dfile=${root}/${fullAppName}.jar \
+      sh """mvn -X --settings ~/.m2/settings.xml deploy:deploy-file -Dfile=${root}/${artifactDirectory}/${tarball} \
       -DrepositoryId=nexus \
       -Durl="${env.ARTIFACT_STORAGE_DEPLOY_URL}" \
       -DgroupId="org.venice.beachfront" \
       -DgeneratePom=false \
-      -Dpackaging=jar \
+      -Dpackaging=tar.gz \
       -Dmaven.repo.local="${root}/.m2/repository" \
       -DartifactId=${artifactId} \
       -Dversion=${appvers}
