@@ -33,6 +33,7 @@ node {
     } else {
       appName = "${appBaseName}-${appvers}"
     }
+    appName = appName.trim()
 
     // Get the Artifact from Nexus
     def getDependencyStatus = sh(script: """mvn --quiet --settings ~/.m2/settings.xml dependency:get \
@@ -60,10 +61,11 @@ node {
     sh "cf target -o ${env.PCF_ORG} -s ${env.PROMOTE_SPACE}"
 
     // Push the app
-    sh "cf push ${appName} -f manifest.jenkins.yml --hostname ${appName} -b ${env.PYTHON_BUILDPACK_NAME} -d ${env.PROMOTE_DOMAIN} --no-start"
+    sh "cf push ${appName} -f manifest.jenkins.yml --hostname ${appName} -b ${env.JAVA_BUILDPACK_NAME} -p ${root}/${appName}.jar -d ${env.PROMOTE_DOMAIN} --no-start"
     try {
         sh "cf set-env ${appName} SPACE ${env.PROMOTE_SPACE}"
         sh "cf set-env ${appName} DOMAIN ${env.PROMOTE_DOMAIN}"
+        sh "cf set-env ${appName} PIAZZA_URL ${env.PIAZZA_URL}"
         sh "cf start ${appName}"
       } catch (Exception e) {
         try {
@@ -77,14 +79,12 @@ node {
       // Assign Routes
       def legacyAppNames = sh(script: "cf routes | grep \"${appBaseName} \" | awk '{print \$4}'", returnStdout: true)
       sh "cf map-route ${appName} ${env.PROMOTE_DOMAIN} --hostname ${appBaseName}"
-      sh "cf map-route ${appName} ${env.PROMOTE_DOMAIN} --hostname beachfront"
       
       // Delete old Routes
       for (Object legacyApp : legacyAppNames.trim().tokenize(',')) {
         def legacyAppName = legacyApp.toString().trim()
         if (legacyAppName != appName) {
           sh "cf unmap-route ${legacyAppName} ${env.PROMOTE_DOMAIN} --hostname ${appBaseName}"
-          sh "cf unmap-route ${legacyAppName} ${env.PROMOTE_DOMAIN} --hostname beachfront"
           sh "cf delete -f ${legacyAppName} -r"
         }
       }
