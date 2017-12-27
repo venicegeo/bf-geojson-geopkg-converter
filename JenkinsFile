@@ -207,7 +207,7 @@ node {
 
   stage("Archive") {
     // Build Tarball
-    def targetFiles = "${root}/${fullAppName}.jar manifest.jenkins.yml"
+    def targetFiles = "${fullAppName}.jar manifest.jenkins.yml"
     def artifactDirectory = "maven-artifact"
     sh "mkdir -p ${root}/${artifactDirectory}"
     def tarball = "bf-geojson-geopkg-converter.tar.gz"
