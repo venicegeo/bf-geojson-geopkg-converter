@@ -1,22 +1,41 @@
 Beachfront GeoJSON -> GPKG Converter
 =====
 
-Requirements:
+##Requirements:
+Before building and running the bf-geojson-geopkg-converter project, please ensure that the following components are available and/or installed, as necessary:
+* [Java](http://www.oracle.com/technetwork/java/javase/downloads/index.html) (JDK for building/developing, otherwise JRE is fine)
+* [Maven (3.5 or later)](https://maven.apache.org/install.html)
+* [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
+* A Piazza-provided API Key - Ask the Piazza team if you need help getting one
+* Access to Nexus is required to build
 
-* Java JDK 1.8+
-* Maven 3.5
+Ensure that the base URL the converter should use to contact the main Piazza endpoint is set. This should contain scheme, domain, and port, and not have a slash suffix (e.g. `https://example.com:1234`)
 
-Launching
-----
+	$ export PIAZZA_URL={Piazza_URL}
 
-`bf-geojson-geopkg-converter` has no mandatory environment setup in order
-to run. One of its endpoints does, however, depend on an environment variable:
+>__Note:__ In the above command, replace {Piazza_URL} with the base URL the converter should use to contact the main Piazza endpoint, (e.g. `https://example.com:1234`)
 
-* `PIAZZA_URL` - The base URL the converter should use to contact the main
-  Piazza endpoint. This should contain scheme, domain, and port, and not
-  have a slash suffix (e.g. `https://example.com:1234`)
+Ensure that the nexus url environment variable `ARTIFACT_STORAGE_URL` is set:
 
-Commands
+	$ export ARTIFACT_STORAGE_URL={Artifact_Storage_URL}
+
+>__Note:__ In the above command, replace {Artifact_Storage_URL} with the nexus url
+
+
+***
+## Setup
+Navigate to the project root directory where the repository will live, and clone the git repository in that location:
+
+	$ mkdir -p {PROJECT_DIR}/src/github.com/venicegeo
+	$ cd {PROJECT_DIR}/src/github.com/venicegeo
+    $ git clone git@github.com:venicegeo/bf-geojson-geopkg-converter.git
+    $ cd bf-geojson-geopkg-converter
+
+>__Note:__ In the above commands, replace {PROJECT_DIR} with the local directory path for where the project source is to be installed.
+
+## Launching
+
+## Commands
 ----
 
 Command | Explanation
@@ -27,7 +46,7 @@ Command | Explanation
 `mvn spring-boot:run` | Run project without building
 `mvn javadoc:javadoc` | Generate Java Docs, found in `target/site/apidocs/`
 
-Usage
+## Usage
 ----
 
 The converter has two endpoints for converting GeoJSON to GPKG:
