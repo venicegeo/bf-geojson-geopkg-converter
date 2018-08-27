@@ -1,7 +1,7 @@
 Beachfront GeoJSON -> GPKG Converter
 =====
 
-##Requirements:
+## Requirements:
 Before building and running the bf-geojson-geopkg-converter project, please ensure that the following components are available and/or installed, as necessary:
 * [Java](http://www.oracle.com/technetwork/java/javase/downloads/index.html) (JDK for building/developing, otherwise JRE is fine)
 * [Maven (3.5 or later)](https://maven.apache.org/install.html)
