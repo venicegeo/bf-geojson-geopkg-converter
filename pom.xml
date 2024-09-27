@@ -45,6 +45,7 @@
             <groupId>mil.nga.geopackage</groupId>
             <artifactId>geopackage</artifactId>
             <version>1.2.4-SF</version>
+
         </dependency>
         <dependency>
             <groupId>org.geotools</groupId>
